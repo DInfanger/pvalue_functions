@@ -473,7 +473,7 @@ conf_dist <- function(
   y_lab <- switch(
     plot_type
     # , p_val = ifelse(alternative %in% "two_sided", expression(paste(italic("P"), "-value (two-sided) / Significance level "~alpha, sep = "")), expression(paste(italic("P"), "-value (one-sided) / Significance level "~alpha, sep = "")))
-    , p_val = expression(paste(italic("P"), "-value (two-sided) / Significance level  "~alpha, sep = ""))
+    , p_val = expression(paste(italic("P"), "-value (two-sided) / Significance level "~alpha, sep = ""))
     , cdf = "Confidence distribution"
     , pdf = "Confidence density"
     , s_val = expression(paste("Surprisal in bits (two-sided ",~italic("P"), "-value)", sep = ""))
@@ -556,7 +556,7 @@ conf_dist <- function(
           , trans = magnify_trans_log(interval_low = cut_logyaxis, interval_high = 1, reducer = cut_logyaxis, reducer2 = 8)
           , sec.axis = sec_axis(
             trans = ~.*(1/2)
-            , name = expression(paste(italic("P"), "-value (one-sided) / Significance level  "~alpha, sep = ""))
+            , name = expression(paste(italic("P"), "-value (one-sided) / Significance level "~alpha, sep = ""))
             , breaks = breaks_one
             , labels = lab_onesided
           )
@@ -570,7 +570,7 @@ conf_dist <- function(
           breaks = seq(0, 1, 0.1)
           , sec.axis = sec_axis(
             ~.*(1/2)
-            , name = expression(paste(italic("P"), "-value (one-sided) / Significance level  "~alpha, sep = ""))
+            , name = expression(paste(italic("P"), "-value (one-sided) / Significance level "~alpha, sep = ""))
             , breaks = seq(0, 1, 0.1)/2
           )
         )
@@ -594,7 +594,7 @@ conf_dist <- function(
     
   }
   
-  if (plot_type %in% c("p_val", "s_val")) {
+  if (plot_type %in% c("p_val", "s_val", "cdf") && !is.null(conf_level)) {
     
     hlines_tmp <- switch(
       alternative
