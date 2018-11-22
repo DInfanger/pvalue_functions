@@ -613,11 +613,13 @@ conf_dist <- function(
   
   if (plot_type %in% c("p_val", "s_val", "cdf") && !is.null(conf_level)) {
     
-    hlines_tmp <- switch(
-      alternative
-      , two_sided = (1 - conf_level)
-      , one_sided = (2 - 2*conf_level)
-    )
+    # hlines_tmp <- switch(
+    #   alternative
+    #   , two_sided = (1 - conf_level)
+    #   , one_sided = (2 - 2*conf_level)
+    # )
+    
+    hlines_tmp <- text_frame$p_value
     
     if (plot_type %in% "s_val") {
       hlines_tmp <- -log2(hlines_tmp)
