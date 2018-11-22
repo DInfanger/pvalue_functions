@@ -1,5 +1,9 @@
 ---
-output: github_document
+title: "*P*-value functions"
+output:
+  github_document:
+    toc: true
+    toc_depth: 3
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -322,9 +326,15 @@ Xie M, Singh K, Strawderman WE. (2011): Confidence Distributions and a Unifying 
 
 Xie Mg, Singh K. (2013): Confidence distribution, the frequentist distribution estimator of a parameter: A review. *Internat Statist Rev.* 81(1): 3-39.
 
+## Contact
+
+[Denis Infanger](https://dsbg.unibas.ch/de/personen/denis-infanger/)
+
 ## License
 
-[GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html).
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+[GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0).
 
 
 

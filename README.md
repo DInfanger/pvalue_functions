@@ -1,3 +1,21 @@
+*P*-value functions
+================
+
+-   [Overview](#overview)
+-   [Installation](#installation)
+-   [Usage](#usage)
+    -   [Required arguments for different estimate types](#required-arguments-for-different-estimate-types)
+    -   [Returned values](#returned-values)
+-   [Examples](#examples)
+    -   [Two-sample *t*-test with unequal variances (Welch-Test)](#two-sample-t-test-with-unequal-variances-welch-test)
+    -   [Single coefficient from a linear regression model](#single-coefficient-from-a-linear-regression-model)
+    -   [Multiple coefficients from a linear regression model](#multiple-coefficients-from-a-linear-regression-model)
+    -   [Pearson correlation coefficient (one-sided)](#pearson-correlation-coefficient-one-sided)
+    -   [Odds ratio from logistic regression](#odds-ratio-from-logistic-regression)
+    -   [Proportion](#proportion)
+-   [References](#references)
+-   [Contact](#contact)
+-   [License](#license)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 Overview
@@ -404,7 +422,14 @@ Xie M, Singh K, Strawderman WE. (2011): Confidence Distributions and a Unifying 
 
 Xie Mg, Singh K. (2013): Confidence distribution, the frequentist distribution estimator of a parameter: A review. *Internat Statist Rev.* 81(1): 3-39.
 
+Contact
+-------
+
+[Denis Infanger](https://dsbg.unibas.ch/de/personen/denis-infanger/)
+
 License
 -------
 
-[GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html).
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+[GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0).
