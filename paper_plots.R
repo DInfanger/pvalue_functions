@@ -53,7 +53,7 @@ stama <- conf_dist(
   , xlab = "HR"
   , xlim = log(c(0.7, 1.9))
   , together = FALSE
-  , plot_p_limit = 1-0.999
+  , plot_p_limit = 1 - 0.999
 )
 
 stama$plot <- stama$plot +
@@ -95,7 +95,7 @@ stama_petersen <- conf_dist(
   , xlab = "HR"
   , xlim = log(c(0.7, 1.9))
   , together = TRUE
-  , plot_p_limit = 0.001
+  , plot_p_limit = 1 - 0.999
 )
 
 stama_petersen$plot$layers[[1]] <- NULL
@@ -154,7 +154,7 @@ canning <- conf_dist(
   , xlab = "IRR"
   , xlim = log(c(0.25, 1.61))
   , together = FALSE
-  , plot_p_limit = 1-0.999
+  , plot_p_limit = 1 - 0.999
 )
 
 canning$plot <- canning$plot +
@@ -199,7 +199,7 @@ hochsmann <- conf_dist(
   , xlab = expression("Adjusted difference in VO"[2*"peak"]*" [ml/(kg" %*% " min)]")
   , xlim = c(-4, 6.5)
   , together = FALSE
-  , plot_p_limit = 1-0.9999
+  , plot_p_limit = 1 - 0.9999
 )
 
 hochsmann$plot$layers[[1]] <- NULL

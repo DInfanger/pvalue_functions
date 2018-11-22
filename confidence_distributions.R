@@ -14,7 +14,7 @@ conf_dist <- function(
   , plot_type = "p_val"
   , n_values = 1e4L
   , est_names = NULL
-  , conf_level = c(0.95, 0.90, 0.80)
+  , conf_level = NULL
   , null_values = NULL
   , trans = "identity"
   , alternative = "two_sided"
@@ -73,7 +73,11 @@ conf_dist <- function(
   
   if (is.null(estimate)) {stop("Please provide an estimate.")}
   
+  if (!alternative %in% c("one_sided", "two_sided")) {stop("Alternative must be either \"two_sided\" or \"one_sided\".")}
+  
   if (plot_p_limit == 0 & log_yaxis == TRUE) {stop("Cannot plot 0 on logarithmic axis.")}
+  
+  if (plot_p_limit > 0.5 & alternative %in% "one_sided") {stop("Limit must be below 0.5 for one-sided hypotheses.")}
   
   if (type %in% c("pearson", "spearman", "kendall", "var", "prop") && !trans %in% "identity") {
     trans <- "identity"
@@ -247,6 +251,7 @@ conf_dist <- function(
       , null_values = null_values
       , alternative = alternative
     )
+    
   } 
   
   #-----------------------------------------------------------------------------
@@ -256,7 +261,7 @@ conf_dist <- function(
   res$res_frame$s_val <- -log2(res$res_frame$p_two)
   
   #-----------------------------------------------------------------------------
-  # Assign estimate names if they were provided
+  # Assign estimate names
   #-----------------------------------------------------------------------------
   
   if (!is.null(est_names)) {
@@ -301,7 +306,7 @@ conf_dist <- function(
   if (is.null(xlim) & plot_type %in% c("p_val", "s_val")) {
     res_tmp <- res$res_frame
     res_tmp$values[res$res_frame$p_two < plot_p_limit] <- NA
-    res_tmp$p_two[res$res_frame$p_two < plot_p_limit] <- NA
+    # res_tmp$p_two[res$res_frame$p_two < plot_p_limit] <- NA
     
     xlim <- range(res_tmp$values, na.rm = TRUE)
     
@@ -326,8 +331,8 @@ conf_dist <- function(
       
       p_val_tmp <- switch(
         alternative
-        , two_sided = (1 - conf_level)
-        , one_sided = (2 - 2*conf_level)
+        , two_sided = round((1 - conf_level), 10)
+        , one_sided = round((2 - 2*conf_level), 10)
       )
       
       text_frame <- data.frame(
@@ -355,8 +360,8 @@ conf_dist <- function(
       
       p_val_tmp <- switch(
         alternative
-        , two_sided = (1 - conf_level)
-        , one_sided = (2 - 2*conf_level)
+        , two_sided = round((1 - conf_level), 10)
+        , one_sided = round((2 - 2*conf_level), 10)
       )
       
       text_frame <- data.frame(
@@ -398,22 +403,28 @@ conf_dist <- function(
   # Cutoff for nicer plotting
   #-----------------------------------------------------------------------------
   
+  p_cutoff <- ifelse(alternative %in% c("two_sided"), plot_p_limit, plot_p_limit*2)
+  
   if (plot_type %in% c("p_val")) {
-    res$res_frame$values[res$res_frame$p_two < plot_p_limit] <- NA
-    res$res_frame$p_two[res$res_frame$p_two < plot_p_limit] <- NA
-    res$res_frame$p_one[res$res_frame$p_one < plot_p_limit] <- NA
+    res$res_frame$values[res$res_frame$p_two < p_cutoff] <- NA
+    res$res_frame$p_two[res$res_frame$p_two < p_cutoff] <- NA
+    res$res_frame$p_one[res$res_frame$p_one < p_cutoff] <- NA
   }
   
   if (plot_type %in% c("s_val")) {
     
     # outside_ind <- which(res$res_frame$values < min(xlim) | res$res_frame$values > max(xlim))
-    outside_ind <- which(res$res_frame$p_two < plot_p_limit)
+    outside_ind <- which(res$res_frame$p_two < p_cutoff)
     
     res$res_frame$values[outside_ind] <- NA
     res$res_frame$p_two[outside_ind] <- NA
     res$res_frame$p_one[outside_ind] <- NA   
     res$res_frame$s_val[outside_ind] <- NA 
     
+  }
+  
+  if (!is.null(conf_level) && any(text_frame$p_value < p_cutoff)) {
+    text_frame <- text_frame[-which(text_frame$p_value < p_cutoff), ]
   }
   
   #-----------------------------------------------------------------------------
@@ -437,12 +448,12 @@ conf_dist <- function(
   # Labeller functions for custom log-scale
   
   lab_onesided <- Vectorize(function(x){
-    if((x < cut_logyaxis_one) & (round((x %% 1)*10) == 0)) {sprintf("%.5g", x)}
+    if(!is.na(x) && (x < cut_logyaxis_one) & (round((x %% 1)*10) == 0)) {sprintf("%.5g", x)}
     else {sprintf("%.2f", x)}
   })
   
   lab_twosided <- Vectorize(function(x){
-    if((x <= cut_logyaxis) & (round((x %% 1)*10) == 0)) {sprintf("%.5g", x)}
+    if(!is.na(x) && (x <= cut_logyaxis) & (round((x %% 1)*10) == 0)) {sprintf("%.5g", x)}
     else {sprintf("%.1f", x)}
   })
   
@@ -515,10 +526,18 @@ conf_dist <- function(
     scale_x_continuous(breaks = scales::pretty_breaks(n = 15))
   
   if (plot_type %in% "p_val") {
-    if (log_yaxis == TRUE) {
+    if (log_yaxis == TRUE & (p_cutoff < cut_logyaxis)) {
       
-      breaks_two <- c(10^(seq(log10(10^(ceiling(round(log10(ifelse(alternative %in% "two_sided", plot_p_limit, plot_p_limit*2)), 5)))), log10(cut_logyaxis), by = 1)), seq(ceiling(cut_logyaxis/0.1)*0.1, 1, by = 0.1))
-      breaks_one <- c(10^(seq(log10(10^(ceiling(round(log10(ifelse(alternative %in% "two_sided", plot_p_limit/2, plot_p_limit)), 5)))), log10(cut_logyaxis_one), by = 1)), seq(ceiling(cut_logyaxis_one/0.05)*0.05, 0.5, 0.05))
+      lower_ylim_two <- 10^(ceiling(round(log10(ifelse(alternative %in% "two_sided", plot_p_limit, plot_p_limit*2)), 5)))
+      lower_ylim_one <- 10^(ceiling(round(log10(ifelse(alternative %in% "two_sided", plot_p_limit/2, plot_p_limit)), 5)))
+      
+      if ((alternative %in% "two_sided" & (lower_ylim_two <= plot_p_limit)) | (alternative %in% "one_sided" & (lower_ylim_one <= plot_p_limit*2))) {
+        breaks_two <- c(10^(seq(log10(lower_ylim_two), log10(cut_logyaxis), by = 1)), seq(ceiling(cut_logyaxis/0.1)*0.1, 1, by = 0.1))
+        breaks_one <- c(10^(seq(log10(lower_ylim_one), log10(cut_logyaxis_one), by = 1)), seq(ceiling(cut_logyaxis_one/0.05)*0.05, 0.5, 0.05))
+      } else {
+        breaks_two <- c(10^(log10(seq(ceiling(cut_logyaxis/0.1)*0.1, 1, by = 0.1))))
+        breaks_one <- c(10^(log10(seq(ceiling(cut_logyaxis_one/0.05)*0.05, 0.5, 0.05))))
+      }
       
       # if (alternative %in% "two_sided") {
       #   breaks_two <- c(breaks_two, cut_logyaxis)
@@ -544,7 +563,7 @@ conf_dist <- function(
         ) +
         annotate("rect", xmin=-Inf, xmax=Inf, ymin=ifelse(alternative %in% "two_sided", plot_p_limit, plot_p_limit*2), ymax=cut_logyaxis, alpha=0.1, colour = grey(0.9)) 
       
-    } else if (log_yaxis == FALSE) {
+    } else if (log_yaxis == FALSE | (p_cutoff >= cut_logyaxis)) {
       p <- p +
         scale_y_continuous(
           # limits = c(plot_p_limit, 1)
@@ -561,7 +580,7 @@ conf_dist <- function(
   if (plot_type %in% "s_val") {
     
     p <- p + scale_y_reverse(
-      limits = c(NA, 0)
+      limits = c(max(res$res_frame$s_val, na.rm = TRUE), 0)
       , breaks = scales::pretty_breaks(n = 10)(c(0, max(res$res_frame$s_val, na.rm = TRUE)))
       # , labels = lab_twosided
       # , trans = trans_surprisal()
@@ -575,7 +594,7 @@ conf_dist <- function(
     
   }
   
-  if (!plot_type %in% c("pdf")) {
+  if (plot_type %in% c("p_val", "s_val")) {
     
     hlines_tmp <- switch(
       alternative
@@ -589,11 +608,7 @@ conf_dist <- function(
     
     p <- p + geom_hline(yintercept = hlines_tmp, linetype = 2)
     
-    if (plot_type %in% "cdf") {
-      p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
-    }
-    
-  } else {
+  } else if (plot_type %in% c("pdf", "cdf")) {
     p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
   }
   
@@ -631,8 +646,7 @@ conf_dist <- function(
     strip.text.x=element_text(size=15)
   )
   
-  if (!plot_type %in% "pdf") {
-    
+  if (!plot_type %in% "pdf" && !is.null(conf_level)) {
     if (plot_type %in% "s_val") {
       text_frame$p_value <- -log2(text_frame$p_value)
     }
@@ -1390,23 +1404,23 @@ magnify_trans_log <- function(interval_low = 0.05, interval_high = 1,  reducer =
   trans_new(name = 'customlog', transform = trans, inverse = inv, domain = c(1e-16, Inf))
 }
 
-# Surprisal transformation
-
-trans_surprisal <- function() {
-  
-  trans <- Vectorize(function(x) {
-    if(!is.na(x)) {
-      -log2(x)
-    } 
-  })
-  
-  inv <- Vectorize(function(x) {
-    if(!is.na(x)) {
-      2^(-x)
-    }
-  })
-  
-  trans_new(name = 'surprisal', transform = trans, inverse = inv, domain = c(1e-16, Inf))
-}
+# # Surprisal transformation
+# 
+# trans_surprisal <- function() {
+#   
+#   trans <- Vectorize(function(x) {
+#     if(!is.na(x)) {
+#       -log2(x)
+#     } 
+#   })
+#   
+#   inv <- Vectorize(function(x) {
+#     if(!is.na(x)) {
+#       2^(-x)
+#     }
+#   })
+#   
+#   trans_new(name = 'surprisal', transform = trans, inverse = inv, domain = c(1e-16, Inf))
+# }
 
 
