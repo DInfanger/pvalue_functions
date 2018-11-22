@@ -10,7 +10,7 @@ conf_dist <- function(
   , df = NULL
   , stderr= NULL
   , tstat = NULL
-  , type= NULL
+  , type = NULL
   , plot_type = "p_val"
   , n_values = 1e4L
   , est_names = NULL
@@ -72,6 +72,8 @@ conf_dist <- function(
   plot_type <- tolower(plot_type)
   
   if (is.null(estimate)) {stop("Please provide an estimate.")}
+  
+  if (length(type) == 0) {stop("Please provide the type of the estimate(s).")}
   
   if (!alternative %in% c("one_sided", "two_sided")) {stop("Alternative must be either \"two_sided\" or \"one_sided\".")}
   
@@ -167,15 +169,22 @@ conf_dist <- function(
     stop("Sample size must be given for variance.")
   }
   
-  if (
-    (!is.null(stderr) & (length(stderr) != length(estimate))) ||
-    (!is.null(n) & (length(n) != length(estimate))) ||
-    (!is.null(df) & (length(df) != length(estimate))) ||
-    (!is.null(tstat) & (length(tstat) != length(estimate)))
-  ) {
-    stop("Standard errors (stderr), sample size (n), degrees of freedom (df) and t-statistics (tstat) must be the same length as estimates.")
+  if (type %in% "ttest" & all(!is.null(n), !is.null(df), !is.null(estimate), !is.null(tstat)) & !identical(length(n), length(df), length(estimate), length(tstat))) {
+    stop("Sample size (n), degrees of freedom (df) and t-statistics (tstat) must be the same length as estimates.")
+  }
+
+  if (type %in% c("linreg", "gammareg", "general_t") & all(!is.null(stderr), !is.null(df), !is.null(estimate)) & !identical(length(stderr), length(df), length(estimate))) {
+    stop("Standard errors (stderr) and degrees of freedom (df) must be the same length as estimates.")
   }
   
+  if (type %in% c("coxreg", "logreg", "poisreg", "general_z") & all(!is.null(stderr), !is.null(estimate)) & !identical(length(stderr), length(estimate))) {
+    stop("Standard errors (stderr) must be the same length as estimates.")
+  }
+  
+  if (type %in% c("pearson", "spearman", "kendall", "var", "prop") & all(!is.null(n), !is.null(estimate)) & !identical(length(n), length(estimate))) {
+    stop("Sample sizes (n) must be the same length as estimates.")
+  }
+
   #-----------------------------------------------------------------------------
   # Calculate the confidence distributions/densities and p-value curves
   #-----------------------------------------------------------------------------
