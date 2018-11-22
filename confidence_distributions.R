@@ -79,6 +79,14 @@ conf_dist <- function(
   
   if (plot_p_limit > 0.5 & alternative %in% "one_sided") {stop("Limit must be below 0.5 for one-sided hypotheses.")}
   
+  if (alternative %in% "two_sided" & any((1 - conf_level) >= 1)) {
+    conf_level <- conf_level[-which((1 - conf_level) >= 1)]
+  } 
+  
+  if (alternative %in% "one_sided" & any((2 - 2*conf_level) >= 1)) {
+    conf_level <- conf_level[-which((2 - 2*conf_level) >= 1)]
+  } 
+  
   if (type %in% c("pearson", "spearman", "kendall", "var", "prop") && !trans %in% "identity") {
     trans <- "identity"
     cat("\nTransformation changed to identity.\n")
