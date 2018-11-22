@@ -54,10 +54,10 @@ conf_dist <- function(
   #-----------------------------------------------------------------------------
   
   require(ggplot2)
-  require(reshape2)
+  # require(reshape2)
   require(scales)
-  require(RColorBrewer)
-  require(MASS)
+  # require(RColorBrewer)
+  # require(MASS)
   require(zipfR)
   
   #-----------------------------------------------------------------------------

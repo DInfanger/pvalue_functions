@@ -3,6 +3,7 @@
 
 -   [Overview](#overview)
 -   [Installation](#installation)
+-   [Dependencies](#dependencies)
 -   [Usage](#usage)
     -   [Required arguments for different estimate types](#required-arguments-for-different-estimate-types)
     -   [Returned values](#returned-values)
@@ -29,6 +30,17 @@ Installation
 Download the file `confidence_distributions.R` to your computer. You can either `source()` the function in R or open it, select and run everything. After loading the function, it's ready for use.
 
 To reproduce the plots from the publication, download the file `paper_plots.R` and run it *after* loading the main function contained in the file `confidence_distributions.R` (see above).
+
+Dependencies
+------------
+
+The function depends on the following R packages, which need to be installed beforehand:
+
+-   ggplot2
+-   scales
+-   zipfR
+
+Use the command `install.packages(c("ggplot2", "scales", "zipfR"))` in R to install those packages.
 
 Usage
 -----
@@ -417,6 +429,8 @@ Poole C. (1987a): Beyond the confidence interval. *Am J Public Health.* 77(2): 1
 Poole C. (1987b) Confidence intervals exclude nothing. *Am J Public Health.* 77(4): 492-3.
 
 Rosenthal R, Rubin DB. (1994): The counternull value of an effect size: A new statistic. Psychol Sci. 5(6): 329-34.
+
+Schweder T, Hjort NL. (2016): Confidence, likelihood, probability: statistical inference with confidence distributions. New York, NY: Cambridge University Press.
 
 Xie M, Singh K, Strawderman WE. (2011): Confidence Distributions and a Unifying Framework for Meta-Analysis. *J Am Stat Assoc* 106(493): 320-33. doi: 10.1198/jasa.2011.tm09803.
 
