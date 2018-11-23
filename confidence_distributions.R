@@ -310,7 +310,7 @@ conf_dist <- function(
     
     if (type %in% "var") {
       for (i in seq_along(estimate)) {
-        estimate[i] <- res$point_est$est_mode[i]
+        estimate[i] <- res$point_est$est_median[i]
       }
     }
     
@@ -718,7 +718,7 @@ cdist_t <- function(
   , alternative = NULL
 ){
   
-  eps <- 1e-7
+  eps <- 1e-10
   
   res_mat <- matrix(NA, nrow = 0, ncol = 6)
   
@@ -848,7 +848,7 @@ cdist_z <- function(
   , alternative = NULL
 ){
   
-  eps <- 1e-7
+  eps <- 1e-10
   
   res_mat <- matrix(NA, nrow = 0, ncol = 6)
   
@@ -980,8 +980,6 @@ cdist_corr <- function(
   , alternative = NULL
 ){
   
-  eps <- 1e-7
-  
   res_mat <- matrix(NA, nrow = 0, ncol = 6)
   
   conf_mat <- matrix(NA, nrow = 0, ncol = 4)
@@ -1111,7 +1109,7 @@ cdist_var <- function(
   , alternative = NULL
 ){
   
-  eps <- 1e-4
+  eps <- 1e-10
   
   df <- (n - 1)
   
@@ -1280,7 +1278,7 @@ cdist_prop1 <- function(
     Re((1i*sqrt(n)*(-x + p*(-1 + 2*x)))/(2*(-1 + x)^(3/2)*x^(3/2)))
   }
   
-  eps <- 1e-7
+  eps <- 1e-10
   
   res_mat <- matrix(NA, nrow = 0, ncol = 6)
   
