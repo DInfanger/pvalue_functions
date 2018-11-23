@@ -81,7 +81,7 @@ The main function `conf_dist()` returns five objects in a list:
 -   **`res_frame`**: A data frame containing the values used to construct the plot.
 -   **`conf_frame`**: A data frame containing the confidence intervals for the specified confidence levels for all estimates.
 -   **`counternull_frame`**: A data frame containing the counternull values for the specified null values (see Rosenthal & Rubin (1994) for more information about the counternull).
--   **`point_est`**: A data frame containing the point estimates for all estimates. The point estimates correspond to the mean, median or mode of the confidence density (see Xie & Singh (2013) for more information).
+-   **`point_est`**: A data frame containing the point estimates for all estimates. The point estimates correspond to the mean, median or mode of the confidence density (see Xie & Singh (2013) for more information). Estimates are produced using numerical procedures: Increase the number of points `n_values` for higher numerical precision.
 -   **`plot`**: A [ggplot2](https://ggplot2.tidyverse.org/) plot object.
 
 Examples

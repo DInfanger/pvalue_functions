@@ -310,7 +310,7 @@ conf_dist <- function(
     
     if (type %in% "var") {
       for (i in seq_along(estimate)) {
-        estimate[i] <- res$point_est$est_median[i]
+        estimate[i] <- res$point_est$est_mode[i]
       }
     }
     
@@ -819,12 +819,12 @@ cdist_t <- function(
   )
   
   mean_fun <- function(x, df, estimate, stderr){
-    x*dt((x - estimate)/stderr, df = df)*(1/stderr)
+    x*dt(((x - estimate)/stderr), df = df)*(1/stderr)
   }
-  
+
   for (i in seq_along(estimate)) {
     
-    point_est_frame$est_mean[i] <- integrate(mean_fun, lower = -Inf, upper = Inf, df = df[i], estimate = estimate[i], stderr = stderr[i])$value # Mean
+    point_est_frame$est_mean[i] <- integrate(mean_fun, lower = min(res_frame$values, na.rm = TRUE), upper = max(res_frame$values, na.rm = TRUE), df = df[i], estimate = estimate[i], stderr = stderr[i], subdivisions = 1e5L)$value # Mean
     point_est_frame$est_median[i] <- res_frame$values[res_frame$variable %in% i][which.min(abs(res_frame$conf_dist[res_frame$variable %in% i][-1] - 0.5)) + 1] # Median
     point_est_frame$est_mode[i] <- res_frame$values[res_frame$variable %in% i][which.max(res_frame$conf_dens[res_frame$variable %in% i])] # Mode
     
@@ -954,7 +954,7 @@ cdist_z <- function(
   
   for (i in seq_along(estimate)) {
     
-    point_est_frame$est_mean[i] <- integrate(mean_fun, lower = -Inf, upper = Inf, stderr = stderr[i], estimate = estimate[i])$value # Mean
+    point_est_frame$est_mean[i] <- integrate(mean_fun, lower = min(res_frame$values, na.rm = TRUE), upper = max(res_frame$values, na.rm = TRUE), stderr = stderr[i], estimate = estimate[i], subdivisions = 1e5L)$value # Mean
     point_est_frame$est_median[i] <- res_frame$values[res_frame$variable %in% i][which.min(abs(res_frame$conf_dist[res_frame$variable %in% i][-1] - 0.5)) + 1] # Median
     point_est_frame$est_mode[i] <- res_frame$values[res_frame$variable %in% i][which.max(res_frame$conf_dens[res_frame$variable %in% i])] # Mode
     
