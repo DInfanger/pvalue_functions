@@ -169,8 +169,8 @@ conf_dist <- function(
     stop("Sample size must be given for variance.")
   }
   
-  if (type %in% "ttest" & all(!is.null(n), !is.null(df), !is.null(estimate), !is.null(tstat)) & !identical(length(n), length(df), length(estimate), length(tstat))) {
-    stop("Sample size (n), degrees of freedom (df) and t-statistics (tstat) must be the same length as estimates.")
+  if (type %in% "ttest" & all(!is.null(df), !is.null(estimate), !is.null(tstat)) & !identical(length(df), length(estimate), length(tstat))) {
+    stop("Degrees of freedom (df) and t-statistics (tstat) must be the same length as estimates.")
   }
 
   if (type %in% c("linreg", "gammareg", "general_t") & all(!is.null(stderr), !is.null(df), !is.null(estimate)) & !identical(length(stderr), length(df), length(estimate))) {
@@ -490,7 +490,7 @@ conf_dist <- function(
   y_lab <- switch(
     plot_type
     # , p_val = ifelse(alternative %in% "two_sided", expression(paste(italic("P"), "-value (two-sided) / Significance level "~alpha, sep = "")), expression(paste(italic("P"), "-value (one-sided) / Significance level "~alpha, sep = "")))
-    , p_val = expression(paste(italic("P"), "-value (two-sided) / Significance level "~alpha, sep = ""))
+    , p_val = expression(paste(italic("P"), "-value (two-sided) / Significance level"~alpha, sep = ""))
     , cdf = "Confidence distribution"
     , pdf = "Confidence density"
     , s_val = expression(paste("Surprisal in bits (two-sided ",~italic("P"), "-value)", sep = ""))
@@ -573,7 +573,7 @@ conf_dist <- function(
           , trans = magnify_trans_log(interval_low = cut_logyaxis, interval_high = 1, reducer = cut_logyaxis, reducer2 = 8)
           , sec.axis = sec_axis(
             trans = ~.*(1/2)
-            , name = expression(paste(italic("P"), "-value (one-sided) / Significance level "~alpha, sep = ""))
+            , name = expression(paste(italic("P"), "-value (one-sided) / Significance level"~alpha, sep = ""))
             , breaks = breaks_one
             , labels = lab_onesided
           )
@@ -587,7 +587,7 @@ conf_dist <- function(
           breaks = seq(0, 1, 0.1)
           , sec.axis = sec_axis(
             ~.*(1/2)
-            , name = expression(paste(italic("P"), "-value (one-sided) / Significance level "~alpha, sep = ""))
+            , name = expression(paste(italic("P"), "-value (one-sided) / Significance level"~alpha, sep = ""))
             , breaks = seq(0, 1, 0.1)/2
           )
         )

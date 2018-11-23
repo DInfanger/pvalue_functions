@@ -69,7 +69,7 @@ There is only one function needed to create the plots: `conf_dist()`. The functi
 
 ### Required arguments for different estimate types
 
--   *t*-tests: `estimate`, `n`, `df`, `tstat`.
+-   *t*-tests: `estimate`, `df`, `tstat`.
 -   Linear regression, Gamma regression, general estimates based on the *t*-distribution: `estimate`, `df`, `stderr`.
 -   Logistic regression, Poisson regression, Cox regression, general estimates based on the normal distribution: `estimate`, `stderr`.
 -   Correlation coefficients (Pearson, Spearman, Kendall), proportions, variances: `estimate`, `n`.
