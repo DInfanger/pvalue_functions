@@ -70,6 +70,8 @@ conf_dist <- function(
   type <- tolower(type)
   plot_type <- gsub("[-|.]", "_", plot_type)
   plot_type <- tolower(plot_type)
+  plot_p_limit <- round(plot_p_limit, 10)
+  cut_logyaxis <- round(cut_logyaxis, 10)
   
   if (is.null(estimate)) {stop("Please provide an estimate.")}
   
@@ -79,7 +81,7 @@ conf_dist <- function(
   
   if (plot_p_limit == 0 & log_yaxis == TRUE) {stop("Cannot plot 0 on logarithmic axis.")}
   
-  if (plot_p_limit > 0.5 & alternative %in% "one_sided") {stop("Limit must be below 0.5 for one-sided hypotheses.")}
+  if (plot_p_limit > 0.5 & alternative %in% "one_sided") {stop("Plot limit must be below 0.5 for one-sided hypotheses.")}
   
   if (alternative %in% "two_sided" & any((1 - conf_level) >= 1)) {
     conf_level <- conf_level[-which((1 - conf_level) >= 1)]
@@ -135,6 +137,10 @@ conf_dist <- function(
   
   if (!is.null(xlim) & (length(xlim) != 2L)) {
     stop("Please provide two limits for the x-axis.") 
+  }
+  
+  if (!is.null(xlim)) {
+    xlim <- sort(xlim, decreasing = FALSE)
   }
   
   if (is.null(type) || (!type %in% c("ttest", "linreg", "gammareg", "general_t", "logreg", "poisreg", "coxreg", "general_z", "pearson", "spearman", "kendall", "var", "prop"))) {
@@ -545,10 +551,10 @@ conf_dist <- function(
   if (plot_type %in% "p_val") {
     if (log_yaxis == TRUE & (p_cutoff < cut_logyaxis)) {
       
-      lower_ylim_two <- 10^(ceiling(round(log10(ifelse(alternative %in% "two_sided", plot_p_limit, plot_p_limit*2)), 5)))
-      lower_ylim_one <- 10^(ceiling(round(log10(ifelse(alternative %in% "two_sided", plot_p_limit/2, plot_p_limit)), 5)))
+      lower_ylim_two <- round(10^(ceiling(round(log10(ifelse(alternative %in% "two_sided", plot_p_limit, plot_p_limit*2)), 5))), 10)
+      lower_ylim_one <- round(10^(ceiling(round(log10(ifelse(alternative %in% "two_sided", plot_p_limit/2, plot_p_limit)), 5))), 10)
       
-      if ((alternative %in% "two_sided" & (lower_ylim_two <= plot_p_limit)) | (alternative %in% "one_sided" & (lower_ylim_one <= plot_p_limit*2))) {
+      if ((alternative %in% "two_sided" & (lower_ylim_two <= cut_logyaxis)) | (alternative %in% "one_sided" & (lower_ylim_one <= cut_logyaxis*2))) {
         breaks_two <- c(10^(seq(log10(lower_ylim_two), log10(cut_logyaxis), by = 1)), seq(ceiling(cut_logyaxis/0.1)*0.1, 1, by = 0.1))
         breaks_one <- c(10^(seq(log10(lower_ylim_one), log10(cut_logyaxis_one), by = 1)), seq(ceiling(cut_logyaxis_one/0.05)*0.05, 0.5, 0.05))
       } else {
