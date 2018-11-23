@@ -22,7 +22,7 @@
 Overview
 --------
 
-This repository contains R functions to create graphics of *p*-value functions, confidence distributions, confidence densities, or the [Shannon surprisal value (S-value)](http://www.umsl.edu/~fraundorfp/egsurpri.html). An R-script to reproduce the plots in the publication is also available.
+This repository contains R functions to create graphics of *p*-value functions, confidence distributions, confidence densities, or the [Surprisal value (S-value)](http://www.umsl.edu/~fraundorfp/egsurpri.html). An R-script to reproduce the plots in the publication is also available.
 
 Installation
 ------------
