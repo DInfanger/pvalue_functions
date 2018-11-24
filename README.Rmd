@@ -349,7 +349,11 @@ Xie Mg, Singh K. (2013): Confidence distribution, the frequentist distribution e
 [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0).
 
 
+## Session info
 
+```{r session_info, include=TRUE, echo=FALSE}
+devtools::session_info()
+```
 
 
 
