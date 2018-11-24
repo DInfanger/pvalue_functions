@@ -16,8 +16,8 @@
     -   [Proportion](#proportion)
 -   [References](#references)
 -   [Contact](#contact)
--   [License](#license)
 -   [Session info](#session-info)
+-   [License](#license)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 Overview
@@ -442,13 +442,6 @@ Contact
 
 [Denis Infanger](https://dsbg.unibas.ch/de/personen/denis-infanger/)
 
-License
--------
-
-[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-
-[GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0).
-
 Session info
 ------------
 
@@ -482,3 +475,10 @@ Session info
     #> [28] glue_1.3.0         evaluate_0.12      rmarkdown_1.10    
     #> [31] labeling_0.3       stringi_1.2.4      compiler_3.5.1    
     #> [34] pillar_1.3.0       backports_1.1.2    pkgconfig_2.0.2
+
+License
+-------
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+[GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0).
