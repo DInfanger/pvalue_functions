@@ -12,7 +12,7 @@ output:
 knitr::opts_chunk$set(
   collapse = TRUE
   , comment = "#>"
-   # ,fig.path = "man/figures/README-"
+  # , tidy.opts = list(width.cutoff = 160, tidy = FALSE)
 )
 ```
 
@@ -352,7 +352,7 @@ Xie Mg, Singh K. (2013): Confidence distribution, the frequentist distribution e
 ## Session info
 
 ```{r session_info, include=TRUE, echo=FALSE}
-devtools::session_info()
+sessionInfo()
 ```
 
 
