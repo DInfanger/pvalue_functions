@@ -190,7 +190,15 @@ conf_dist <- function(
   if (type %in% c("pearson", "spearman", "kendall", "var", "prop") & all(!is.null(n), !is.null(estimate)) & !identical(length(n), length(estimate))) {
     stop("Sample sizes (n) must be the same length as estimates.")
   }
-
+  
+  if (type %in% c("spearman") & (any(estimate >= 0.9) | any(n < 10))) {
+    warning("Approximations for Spearman's correlation are only valid for r < 0.9 and n >= 10. Interpret with caution.")
+  }
+  
+  if (type %in% c("kendall") & any(estimate >= 0.8)) {
+    warning("Approximations for Kendall's correlation are only valid for r < 0.8. Interpret with caution.")
+  }
+  
   #-----------------------------------------------------------------------------
   # Calculate the confidence distributions/densities and p-value curves
   #-----------------------------------------------------------------------------
@@ -235,6 +243,8 @@ conf_dist <- function(
   } else if (type %in% c("pearson", "spearman", "kendall")) {
     
     # Calculate approximate standard error for each type of correlation coefficient
+    # Ref 1: Bonett & Wright (2000): Sample size requirements for estimating Pearson, Kendall and Spearman correlations
+    # Ref 2: Fieller, Hartley, Pearson (1957): Tests for rank correlation coefficients I.
     
     stderr <- switch(
       type
@@ -555,6 +565,9 @@ conf_dist <- function(
       lower_ylim_one <- round(10^(ceiling(round(log10(ifelse(alternative %in% "two_sided", plot_p_limit/2, plot_p_limit)), 5))), 10)
       
       if ((alternative %in% "two_sided" & (lower_ylim_two <= cut_logyaxis)) | (alternative %in% "one_sided" & (lower_ylim_one <= cut_logyaxis*2))) {
+        
+        # Split the breaks into two parts: i) below the cutoff i.e. the logarithmic part and ii) the linear part above the cutoff
+        
         breaks_two <- c(10^(seq(log10(lower_ylim_two), log10(cut_logyaxis), by = 1)), seq(ceiling(cut_logyaxis/0.1)*0.1, 1, by = 0.1))
         breaks_one <- c(10^(seq(log10(lower_ylim_one), log10(cut_logyaxis_one), by = 1)), seq(ceiling(cut_logyaxis_one/0.05)*0.05, 0.5, 0.05))
       } else {
@@ -567,6 +580,8 @@ conf_dist <- function(
       # } else if (alternative %in% "one_sided") {
       #   breaks_one <- c(breaks_one, cut_logyaxis_one)
       # }
+      
+      # Remove possible duplicates
       
       breaks_two <- unique(breaks_two)
       breaks_one <- unique(breaks_one)
