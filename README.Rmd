@@ -36,6 +36,12 @@ The function depends on the following R packages, which need to be installed bef
 
 Use the command `install.packages(c("ggplot2", "scales", "zipfR"))` in R to install those packages.
 
+### Important information!
+
+The newest version of [ggplot2 (3.1.0)](https://cran.r-project.org/web/packages/ggplot2/index.html) has a [bug](https://github.com/tidyverse/ggplot2/issues/2978) in `sec_axis` that will lead to the secondary y-axis being labelled wrongly.
+
+It is therefore recommended that you install the prior version of ggplot2 until the bug has been fixed. You can install the prior version using the following command: `install_version("ggplot2", version = "3.0.0", repos = "http://cran.us.r-project.org")`
+
 ## Usage
 
 There is only one function needed to create the plots: `conf_dist()`. The function has the following arguments:
