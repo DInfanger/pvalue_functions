@@ -252,7 +252,7 @@ conf_dist <- function(
       , spearman = sqrt((1 + (estimate)^2/2)/(n - 3))
       , kendall = sqrt(0.437/(n - 4))
     )
-    
+
     res <- cdist_corr(
       estimate = estimate
       , stderr = stderr
