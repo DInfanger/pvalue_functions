@@ -452,7 +452,7 @@ Contact
 Session info
 ------------
 
-    #> R version 3.5.1 (2018-07-02)
+    #> R version 3.5.3 (2019-03-11)
     #> Platform: x86_64-w64-mingw32/x64 (64-bit)
     #> Running under: Windows 10 x64 (build 17134)
     #> 
@@ -470,18 +470,17 @@ Session info
     #> [1] zipfR_0.6-10       scales_1.0.0       ggplot2_3.1.0.9000
     #> 
     #> loaded via a namespace (and not attached):
-    #>  [1] Rcpp_1.0.0         bindr_0.1.1        knitr_1.21        
-    #>  [4] magrittr_1.5       tidyselect_0.2.5   munsell_0.5.0     
-    #>  [7] colorspace_1.3-2   R6_2.3.0           rlang_0.3.0.1     
-    #> [10] stringr_1.3.1      plyr_1.8.4         dplyr_0.7.8       
-    #> [13] tools_3.5.1        grid_3.5.1         gtable_0.2.0      
-    #> [16] xfun_0.4           withr_2.1.2        htmltools_0.3.6   
-    #> [19] assertthat_0.2.0   yaml_2.2.0         lazyeval_0.2.1    
-    #> [22] digest_0.6.18      tibble_1.4.2       crayon_1.3.4      
-    #> [25] bindrcpp_0.2.2     RColorBrewer_1.1-2 purrr_0.2.5       
-    #> [28] glue_1.3.0         evaluate_0.12      rmarkdown_1.11    
-    #> [31] labeling_0.3       stringi_1.2.4      compiler_3.5.1    
-    #> [34] pillar_1.3.1       pkgconfig_2.0.2
+    #>  [1] Rcpp_1.0.0         knitr_1.22         magrittr_1.5      
+    #>  [4] tidyselect_0.2.5   munsell_0.5.0      colorspace_1.4-0  
+    #>  [7] R6_2.4.0           rlang_0.3.1        stringr_1.4.0     
+    #> [10] plyr_1.8.4         dplyr_0.8.0.1      tools_3.5.3       
+    #> [13] grid_3.5.3         gtable_0.2.0       xfun_0.5          
+    #> [16] withr_2.1.2        htmltools_0.3.6    assertthat_0.2.0  
+    #> [19] yaml_2.2.0         lazyeval_0.2.2     digest_0.6.18     
+    #> [22] tibble_2.0.1       crayon_1.3.4       RColorBrewer_1.1-2
+    #> [25] purrr_0.3.2        glue_1.3.1         evaluate_0.13     
+    #> [28] rmarkdown_1.12     labeling_0.3       stringi_1.4.3     
+    #> [31] compiler_3.5.3     pillar_1.3.1       pkgconfig_2.0.2
 
 License
 -------
