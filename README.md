@@ -33,6 +33,18 @@ Download the file `confidence_distributions.R` to your computer. You can either 
 
 To reproduce the plots from the publication, download the file `paper_plots.R` and run it *after* loading the main function contained in the file `confidence_distributions.R` (see above).
 
+Alternatively, you can source the files directly from the GitHub repository using the [`devtools`](https://cran.r-project.org/web/packages/devtools/index.html) package:
+
+``` r
+library(devtools)
+
+# Load main function
+source_url("https://raw.githubusercontent.com/DInfanger/pvalue_functions/master/confidence_distributions.R")
+
+# Load file to reproduce figures in the publication
+source_url("https://raw.githubusercontent.com/DInfanger/pvalue_functions/master/paper_plots.R")
+```
+
 Dependencies
 ------------
 
