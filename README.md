@@ -24,7 +24,7 @@
 Overview
 --------
 
-This repository contains R functions to create graphics of *p*-value functions, confidence distributions, confidence densities, or the [Surprisal value (S-value)](http://www.umsl.edu/~fraundorfp/egsurpri.html). An R-script to reproduce the plots in the publication is also available.
+This repository contains R functions to create graphics of *p*-value functions, confidence distributions, confidence densities, or the [Surprisal value (S-value)](http://www.umsl.edu/~fraundorfp/egsurpri.html) (Greenalnd 2019). An R-script to reproduce the plots in the publication is also available.
 
 Installation
 ------------
@@ -444,6 +444,8 @@ References
 
 Bender R, Berg G, Zeeb H. (2005): Tutorial: using confidence curves in medical research. *Biom J.* 47(2): 237-47.
 
+Greenland S (2019): Valid *P*-Values Behave Exactly as They Should: Some Misleading Criticisms of *P*-Values and Their Resolution with *S*-Values. *The American Statistician,* 73sup1, 106-114.
+
 Poole C. (1987a): Beyond the confidence interval. *Am J Public Health.* 77(2): 195-9.
 
 Poole C. (1987b) Confidence intervals exclude nothing. *Am J Public Health.* 77(4): 492-3.
@@ -482,14 +484,14 @@ Session info
     #> [1] zipfR_0.6-10       scales_1.0.0       ggplot2_3.1.0.9000
     #> 
     #> loaded via a namespace (and not attached):
-    #>  [1] Rcpp_1.0.0         knitr_1.22         magrittr_1.5      
-    #>  [4] tidyselect_0.2.5   munsell_0.5.0      colorspace_1.4-0  
-    #>  [7] R6_2.4.0           rlang_0.3.1        stringr_1.4.0     
+    #>  [1] Rcpp_1.0.1         knitr_1.22         magrittr_1.5      
+    #>  [4] tidyselect_0.2.5   munsell_0.5.0      colorspace_1.4-1  
+    #>  [7] R6_2.4.0           rlang_0.3.2        stringr_1.4.0     
     #> [10] plyr_1.8.4         dplyr_0.8.0.1      tools_3.5.3       
     #> [13] grid_3.5.3         gtable_0.2.0       xfun_0.5          
-    #> [16] withr_2.1.2        htmltools_0.3.6    assertthat_0.2.0  
+    #> [16] withr_2.1.2        htmltools_0.3.6    assertthat_0.2.1  
     #> [19] yaml_2.2.0         lazyeval_0.2.2     digest_0.6.18     
-    #> [22] tibble_2.0.1       crayon_1.3.4       RColorBrewer_1.1-2
+    #> [22] tibble_2.1.1       crayon_1.3.4       RColorBrewer_1.1-2
     #> [25] purrr_0.3.2        glue_1.3.1         evaluate_0.13     
     #> [28] rmarkdown_1.12     labeling_0.3       stringi_1.4.3     
     #> [31] compiler_3.5.3     pillar_1.3.1       pkgconfig_2.0.2
