@@ -444,6 +444,8 @@ References
 
 Bender R, Berg G, Zeeb H. (2005): Tutorial: using confidence curves in medical research. *Biom J.* 47(2): 237-47.
 
+Fraser D. A. S. (2019): The *p*-value function and statistical inference. *The American Statistician,* 73:sup1, 135-147.
+
 Greenland S (2019): Valid *P*-Values Behave Exactly as They Should: Some Misleading Criticisms of *P*-Values and Their Resolution with *S*-Values. *The American Statistician,* 73sup1, 106-114.
 
 Poole C. (1987a): Beyond the confidence interval. *Am J Public Health.* 77(2): 195-9.
@@ -488,7 +490,7 @@ Session info
     #>  [4] tidyselect_0.2.5   munsell_0.5.0      colorspace_1.4-1  
     #>  [7] R6_2.4.0           rlang_0.3.2        stringr_1.4.0     
     #> [10] plyr_1.8.4         dplyr_0.8.0.1      tools_3.5.3       
-    #> [13] grid_3.5.3         gtable_0.2.0       xfun_0.5          
+    #> [13] grid_3.5.3         gtable_0.3.0       xfun_0.5          
     #> [16] withr_2.1.2        htmltools_0.3.6    assertthat_0.2.1  
     #> [19] yaml_2.2.0         lazyeval_0.2.2     digest_0.6.18     
     #> [22] tibble_2.1.1       crayon_1.3.4       RColorBrewer_1.1-2
