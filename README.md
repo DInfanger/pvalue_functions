@@ -77,7 +77,7 @@ to install those packages.
 ### Important information\!
 
 The newest version of [ggplot2
-(3.1.0)](https://cran.r-project.org/web/packages/ggplot2/index.html) has
+(3.1.1)](https://cran.r-project.org/web/packages/ggplot2/index.html) has
 a [bug](https://github.com/tidyverse/ggplot2/issues/2978) in `sec_axis`
 that will lead to the secondary y-axis being labelled wrongly.
 

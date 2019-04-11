@@ -52,7 +52,7 @@ Use the command `install.packages(c("ggplot2", "scales", "zipfR"))` in R to inst
 
 ### Important information!
 
-The newest version of [ggplot2 (3.1.0)](https://cran.r-project.org/web/packages/ggplot2/index.html) has a [bug](https://github.com/tidyverse/ggplot2/issues/2978) in `sec_axis` that will lead to the secondary y-axis being labelled wrongly.
+The newest version of [ggplot2 (3.1.1)](https://cran.r-project.org/web/packages/ggplot2/index.html) has a [bug](https://github.com/tidyverse/ggplot2/issues/2978) in `sec_axis` that will lead to the secondary y-axis being labelled wrongly.
 
 It is therefore recommended that you install the developmental version of ggplot2 until the bug has been fixed. You can install the developmental version using the following command (after installing the [`devtools`](https://cran.r-project.org/web/packages/devtools/index.html) package): `devtools::install_github("tidyverse/ggplot2")`
 
