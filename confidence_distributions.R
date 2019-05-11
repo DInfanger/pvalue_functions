@@ -91,7 +91,7 @@ conf_dist <- function(
     conf_level <- conf_level[-which((2 - 2*conf_level) >= 1)]
   } 
   
-  if (type %in% c("pearson", "spearman", "kendall", "var", "prop") && !trans %in% "identity") {
+  if (type %in% c("pearson", "spearman", "kendall", "var", "prop", "propdiff") && !trans %in% "identity") {
     trans <- "identity"
     cat("\nTransformation changed to identity.\n")
   }
@@ -110,10 +110,21 @@ conf_dist <- function(
   #   stop("Only exponential, logarithmic and square root transformations are supported.")
   # }
   
-  if (type %in% "prop" && (any(estimate < 0) || any(estimate > 1))) {
+  if (type %in% c("prop", "propdiff") && (any(estimate < 0) || any(estimate > 1))) {
     stop("Please provide proportion estimates as decimals between 0 and 1.")
   }
   
+  if (type %in% "propdiff" && ((length(estimate) != 2) || (length(n) != 2))) {
+    stop("Please provide exactly two estimates and to sample sizes (n) for a difference in proportions.")
+  }
+  
+  if (type %in% "propdiff" && !plot_type %in% c("p_val", "s_val")) {
+    stop("Currently, only P-value functions (p_val) and S-value functions (s_val) are allowed for difference in proportions.")
+  }
+  
+  if (type %in% "propdiff" &&( ((estimate[1]*n[1])%%1 >= 0.05) || ((estimate[2]*n[2])%%1 >= 0.05))) {
+    warning("Number of successes (i.e. estimate*n) of proportions not integer! The the number of successes was rounded (i.e. round(estimate*n)).")
+  }
   
   if (!is.null(conf_level) & any(conf_level <= 0) || any(conf_level >= 1)) {
     stop("Confidence levels must lie between 0 and 1.")
@@ -131,8 +142,12 @@ conf_dist <- function(
     stop("Length of x-axis label must be 1.")
   }
   
-  if (!is.null(est_names) & (length(est_names) != length(estimate))) {
+  if (!type %in% "propdiff" && !is.null(est_names) & (length(est_names) != length(estimate))) {
     stop("Length of estimates does not match length of estimate names.")
+  }
+  
+  if (type %in% "propdiff" && !is.null(est_names) & (length(est_names) > 1)) {
+    stop("Only one estimate name for a proportion difference.")
   }
   
   if (!is.null(xlim) & (length(xlim) != 2L)) {
@@ -143,12 +158,16 @@ conf_dist <- function(
     xlim <- sort(xlim, decreasing = FALSE)
   }
   
-  if (is.null(type) || (!type %in% c("ttest", "linreg", "gammareg", "general_t", "logreg", "poisreg", "coxreg", "general_z", "pearson", "spearman", "kendall", "var", "prop"))) {
-    stop("\"type\" must be one of: ttest, linreg, gammareg, general_t, logreg, poisreg, coxreg, general_z, pearson, spearman, kendall, var and prop.")
+  if (is.null(type) || (!type %in% c("ttest", "linreg", "gammareg", "general_t", "logreg", "poisreg", "coxreg", "general_z", "pearson", "spearman", "kendall", "var", "prop", "propdiff"))) {
+    stop("\"type\" must be one of: ttest, linreg, gammareg, general_t, logreg, poisreg, coxreg, general_z, pearson, spearman, kendall, var, prop and propdiff.")
   }
   
   if (is.null(est_names)) {
-    est_names <- (1L:length(estimate))
+    if (type %in% "propdiff") {
+      est_names <- (1L)
+    } else {
+      est_names <- (1L:length(estimate))
+    }
   }
   
   if (type %in% "ttest" & (is.null(tstat) || is.null(df))){
@@ -178,7 +197,7 @@ conf_dist <- function(
   if (type %in% "ttest" & all(!is.null(df), !is.null(estimate), !is.null(tstat)) & !identical(length(df), length(estimate), length(tstat))) {
     stop("Degrees of freedom (df) and t-statistics (tstat) must be the same length as estimates.")
   }
-
+  
   if (type %in% c("linreg", "gammareg", "general_t") & all(!is.null(stderr), !is.null(df), !is.null(estimate)) & !identical(length(stderr), length(df), length(estimate))) {
     stop("Standard errors (stderr) and degrees of freedom (df) must be the same length as estimates.")
   }
@@ -252,7 +271,7 @@ conf_dist <- function(
       , spearman = sqrt((1 + (estimate)^2/2)/(n - 3))
       , kendall = sqrt(0.437/(n - 4))
     )
-
+    
     res <- cdist_corr(
       estimate = estimate
       , stderr = stderr
@@ -285,7 +304,20 @@ conf_dist <- function(
       , alternative = alternative
     )
     
-  } 
+  } else if (type %in% "propdiff") {
+    
+    res <-  cdist_propdiff(
+      estimate = estimate
+      , n = n
+      , n_values = n_values
+      , conf_level = conf_level
+      , null_values = null_values
+      , alternative = alternative
+    )
+    
+    estimate <- estimate[1] - estimate[2]
+    
+  }
   
   #-----------------------------------------------------------------------------
   # Calculate Shannon-surprisal value (S-value)
@@ -836,7 +868,7 @@ cdist_t <- function(
   mean_fun <- function(x, df, estimate, stderr){
     x*dt(((x - estimate)/stderr), df = df)*(1/stderr)
   }
-
+  
   for (i in seq_along(estimate)) {
     
     point_est_frame$est_mean[i] <- integrate(mean_fun, lower = -Inf, upper = Inf, df = df[i], estimate = estimate[i], stderr = stderr[i], rel.tol = 1e-10)$value # Mean
@@ -1266,6 +1298,59 @@ wilson_ci <- function(
   
 }
 
+wilson_cicc <- function(
+  estimate
+  , n
+  , conf_level
+  , alternative
+) {
+  
+  z <- qnorm((conf_level + 1)/2)
+  x <- round(estimate*n) # To get number of successes/failures
+  estimate_compl <- 1 - estimate # Complement of estimate
+  
+  lower <- max(0, (2*x + z^2 - 1 - z*sqrt(z^2 - 2 - 1/n + 4*estimate*(n*estimate_compl + 1)))/(2*(n + z^2)))
+  upper <- min(1, (2*x + z^2 + 1 + z*sqrt(z^2 + 2 - 1/n + 4*estimate*(n*estimate_compl - 1)))/(2*(n + z^2)))
+  
+  c(lower, upper)
+  
+}
+
+wilson_cicc_diff <- function(
+  estimate
+  , n
+  , conf_level
+  , alternative
+) {
+  
+  est_diff <- (estimate[1] - estimate[2])
+  
+  res1 <- wilson_cicc(
+    estimate = estimate[1]
+    , n = n[1]
+    , conf_level = conf_level
+    , alternative = alternative
+  )
+  
+  res2 <- wilson_cicc(
+    estimate = estimate[2]
+    , n = n[2]
+    , conf_level = conf_level
+    , alternative = alternative
+  )
+  
+  l1 <- res1[1]
+  u1 <- res1[2]
+  l2 <- res2[1]
+  u2 <- res2[2]
+  
+  lim1 <- max(-1, est_diff + sqrt((estimate[1] - l1)^2 + (u2 - estimate[2])^2))
+  lim2 <- min(1, est_diff - sqrt((u1 - estimate[1])^2 + (estimate[2] - l2)^2))
+  
+  sort(c(lim1, lim2), decreasing = FALSE)
+  
+}
+
 cdist_prop1 <- function(
   estimate = NULL
   , n = NULL
@@ -1415,6 +1500,180 @@ cdist_prop1 <- function(
   
 }
 
+cdist_propdiff <- function(
+  estimate = NULL
+  , n = NULL
+  , n_values = NULL
+  , conf_level = NULL
+  , null_values = NULL
+  , alternative = NULL
+){
+  
+  # estimate <- c(0.5, 49/90)
+  # n <- c(100, 90)
+  # n_values <- 1e4
+  # conf_level <- c(0.95, 0.99)
+  # null_values <- c(0, 0.5)
+  # alternative <- "two_sided"
+  
+  eps <- 1e-15
+  
+  res_mat <- matrix(NA, nrow = 0, ncol = 6)
+  
+  conf_mat <- matrix(NA, nrow = 0, ncol = 4)
+  
+  counternull_mat <- matrix(NA, nrow = 0, ncol = 3)
+  
+  # for (i in seq_along(estimate)) {
+  
+  # limits <- wilson_cicc_diff(estimate = estimate, n = n, conf_level = (1 - eps), alternative = alternative)
+  
+  conf_levels <- seq(eps, 1 - eps, length.out = ceiling(n_values/2))
+  x_calc <- sapply(conf_levels, wilson_cicc_diff, estimate = estimate, n = n, alternative = alternative)
+  
+  val_min <- wilson_cicc_diff(estimate, n, conf_level = eps)
+  val_between <- seq(min(val_min), max(val_min), length.out = 100)
+  
+  res_mat_tmp <- matrix(NA, nrow = length(x_calc) + 100, ncol = 6)
+  
+  res_mat_tmp[, 1] <- c(x_calc[1, ], x_calc[2, ], val_between)
+  is.na(res_mat_tmp[, 2]) <- TRUE # No confidence distribution for this one
+  is.na(res_mat_tmp[, 3]) <- TRUE # No confidence density for this one
+  res_mat_tmp[, 4] <- c(1 - conf_levels, 1 - conf_levels, rep(NA, 100))
+  res_mat_tmp[, 5] <- c((1 - conf_levels)/2, (1 - conf_levels)/2, rep(NA, 100))
+  res_mat_tmp[, 6] <- rep(1, times = (length(x_calc) + 100))
+  
+  res_mat <- rbind(res_mat, res_mat_tmp)
+  
+  # Confidence intervals
+  
+  if (!is.null(conf_level)) {
+    
+    conf_tmp <- switch(
+      alternative
+      , two_sided = conf_level
+      , one_sided = 2*conf_level - 1
+    )
+    
+    conf_mat_tmp <- matrix(NA, ncol = 4, nrow = length(conf_level))
+    
+    limits_tmp <- matrix(NA, ncol = 2, nrow = length(conf_tmp))
+
+    for (j in seq_along(conf_tmp)) {
+      limits_tmp[j, ] <- wilson_cicc_diff(estimate = estimate, n = n, conf_level = conf_tmp[j], alternative = alternative)
+    }
+    
+    conf_mat_tmp[, 1] <- conf_level
+    conf_mat_tmp[, 2] <- limits_tmp[, 1]
+    conf_mat_tmp[, 3] <- limits_tmp[, 2]
+    conf_mat_tmp[, 4] <- rep(1, length(conf_level))
+    
+    conf_mat <- rbind(conf_mat, conf_mat_tmp)
+    
+  }
+  
+  # Counternulls
+  
+  if (!is.null(null_values)) {
+    
+    cnull_tmp <- rep(NA, length(null_values))
+    
+    tmp_fun_up <- function(conf_level, estimate, n, null_values) {
+      wilson_cicc_diff(estimate = estimate, n = n, conf_level = conf_level)[2] - null_values
+    }
+    
+    tmp_fun_low <- function(conf_level, estimate, n, null_values) {
+      wilson_cicc_diff(estimate = estimate, n = n, conf_level = conf_level)[1] - null_values
+    }
+    
+    for (j in seq_along(null_values)) {
+      
+      if ((null_values[j] > max(res_mat_tmp[, 1])) || (null_values[j] < min(res_mat_tmp[, 1]))) {
+        is.na(cnull_tmp[j]) <- TRUE
+      } else {
+        
+        if (null_values[j] > -diff(estimate)) {
+          
+          null_conf <- uniroot(
+            tmp_fun_up
+            , lower = 1e-15
+            , upper = 1 - 1e-15
+            , null_values = null_values[j]
+            , estimate = estimate
+            , n = n
+          )$root
+          
+          cnull_tmp[j] <- wilson_cicc_diff(estimate = estimate, n = n, conf_level = null_conf)[1]
+          
+        } else if (null_values[j] < -diff(estimate)) {
+          
+          null_conf <- uniroot(
+            tmp_fun_low
+            , lower = 1e-15
+            , upper = 1 - 1e-15
+            , null_values = null_values[j]
+            , estimate = estimate
+            , n = n
+          )$root
+          
+          cnull_tmp[j] <- wilson_cicc_diff(estimate = estimate, n = n, conf_level = null_conf)[2]
+        }
+      }
+    }
+    
+    
+    counternull_mat_tmp <- matrix(NA, ncol = 3, nrow = length(null_values))
+    counternull_mat_tmp[, 1] <- null_values
+    counternull_mat_tmp[, 2] <- cnull_tmp
+    counternull_mat_tmp[, 3] <- rep(1, length(null_values))
+    counternull_mat <- rbind(counternull_mat, counternull_mat_tmp)
+    
+  }
+  
+  # }
+  
+  res_frame <- as.data.frame(res_mat)
+  
+  names(res_frame) <- c("values", "conf_dist", "conf_dens", "p_two", "p_one", "variable")
+  
+  if (!is.null(conf_level)) {
+    
+    conf_frame <- as.data.frame(conf_mat)
+    
+    names(conf_frame) <- c("conf_level", "lwr", "upr", "variable")
+    
+  } else {
+    conf_frame <- NULL
+  }
+  
+  if (!is.null(null_values)) {
+    
+    counternull_frame <- as.data.frame(counternull_mat)
+    
+    names(counternull_frame) <- c("null_value", "counternull", "variable")
+    
+  } else {
+    counternull_frame <- NULL
+  }
+  
+  # Point estimators
+  
+  point_est_frame <- data.frame(
+    est_mean = rep(NA, 1)
+    , est_median = rep(NA, 1)
+    , est_mode = rep(NA, 1)
+    , variable = seq(1, 1, 1)
+  )
+  
+  return(list(
+    res_frame = res_frame
+    , conf_frame = conf_frame
+    , counternull_frame = counternull_frame
+    , point_est = point_est_frame
+  ))
+  
+}
+
 # Define new mixed scale: log for p <= 0.05, else linear
 
 magnify_trans_log <- function(interval_low = 0.05, interval_high = 1,  reducer = 0.05, reducer2 = 8) {
@@ -1442,6 +1701,8 @@ magnify_trans_log <- function(interval_low = 0.05, interval_high = 1,  reducer =
   trans_new(name = 'customlog', transform = trans, inverse = inv, domain = c(1e-16, Inf))
 }
 
+
+
 # # Surprisal transformation
 # 
 # trans_surprisal <- function() {
@@ -1460,5 +1721,3 @@ magnify_trans_log <- function(interval_low = 0.05, interval_high = 1,  reducer =
 #   
 #   trans_new(name = 'surprisal', transform = trans, inverse = inv, domain = c(1e-16, Inf))
 # }
-
-
