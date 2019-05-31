@@ -8,7 +8,7 @@ conf_dist <- function(
   estimate = NULL
   , n = NULL
   , df = NULL
-  , stderr= NULL
+  , stderr = NULL
   , tstat = NULL
   , type = NULL
   , plot_type = "p_val"
@@ -24,6 +24,7 @@ conf_dist <- function(
   , xlim = NULL
   , together = FALSE
   , plot_p_limit = (1 - 0.999)
+  , plot_counternull = FALSE
 ) {
   
   # Generates confidence distributions (cdf), confidence densities (pdf), shannon suprisal (s-value) and p-value functions for several estimates.
@@ -493,6 +494,40 @@ conf_dist <- function(
   }
   
   #-----------------------------------------------------------------------------
+  # Add counternull values to the result frame for plotting
+  #-----------------------------------------------------------------------------
+  
+  if (!is.null(null_values) && plot_counternull == TRUE && plot_type %in% c("p_val", "s_val")) {
+    
+    res$res_frame$counternull <- NA
+    
+    null_values_trans <- do.call(trans, list(x = null_values))
+    
+    for (i in seq_along(estimate)) {
+      
+      plot_range_tmp <- range(res$res_frame$values[res$res_frame$variable %in% est_names[i]], na.rm = TRUE)
+      
+      for (j in seq_along(null_values)) {
+        
+        counternull_tmp <- res$counternull_frame$counternull[res$counternull_frame$variable %in% est_names[i] & res$counternull_frame$null_value %in% null_values_trans[j]]
+
+        if ((counternull_tmp <= plot_range_tmp[2]) & (counternull_tmp >= plot_range_tmp[1])) {
+          
+          counternull_index_tmp <- which.min(abs(res$res_frame$values[res$res_frame$variable %in% est_names[i]] - counternull_tmp))
+          
+          res$res_frame$counternull[res$res_frame$variable %in% est_names[i]][counternull_index_tmp] <- res$res_frame$p_two[res$res_frame$variable %in% est_names[i]][which.min(abs(res$res_frame$values[res$res_frame$variable %in% est_names[i]] - null_values_trans[j]))]
+            
+        }
+      }
+    }
+    
+    if (plot_type %in% "s_val") {
+      res$res_frame$counternull <- -log2(res$res_frame$counternull)
+    }
+    
+  }
+  
+  #-----------------------------------------------------------------------------
   # Plot using ggplot2
   #-----------------------------------------------------------------------------
   
@@ -543,7 +578,7 @@ conf_dist <- function(
     , pdf = "Confidence density"
     , s_val = expression(paste("Surprisal in bits (two-sided ",~italic("P"), "-value)", sep = ""))
   )
-  
+
   p <- ggplot(res$res_frame, aes(x = values, y = eval(parse(text = y_var)), group = variable))
   
   if ((length(estimate) >= 2) & together == TRUE) {
@@ -744,6 +779,21 @@ conf_dist <- function(
     #     , hjust = "inward"
     #   )
     # }
+  }
+  
+  if (!is.null(null_values) && plot_counternull == TRUE && plot_type %in% c("p_val", "s_val") && !all(is.na(res$res_frame$counternull))) {
+    
+    if (together == TRUE) {
+      
+      p <- p + geom_point(aes(x = values, y = counternull, colour = variable), size = 4, pch = 21, fill = "white", stroke = 1.7) +
+        guides(colour = guide_legend(override.aes = list(pch = NA)))
+
+    } else if (together == FALSE) {
+      
+      p <- p + geom_point(aes(x = values, y = counternull), colour = "black", size = 4, pch = 21, fill = "white", stroke = 1.7)
+      
+    }
+
   }
   
   res$plot <- p
