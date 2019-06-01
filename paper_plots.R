@@ -8,6 +8,7 @@
 #-----------------------------------------------------------------------------------------
 
 library(ggpubr)
+library(metafor)
 
 #-----------------------------------------------------------------------------------------
 # Set paths
@@ -17,7 +18,7 @@ library(ggpubr)
 
 gpath <- "./output/graphics"
 tpath <- "./output/text"
-# scripts_path <- "./scripts"
+# scripts_path <- ""
 
 #-----------------------------------------------------------------------------------------
 # Load function
@@ -29,7 +30,7 @@ source(paste(scripts_path, "confidence_distributions.R", sep = "/"))
 # Graphics
 #=========================================================================================
 #-----------------------------------------------------------------------------------------
-# Stamatakis et al. (2017): Br J Sports Med
+# Stamatakis et al. (2017): Br J Sports Med (Figure 1A)
 #-----------------------------------------------------------------------------------------
 
 stama <- conf_dist(
@@ -41,24 +42,23 @@ stama <- conf_dist(
     0.1336387
   )
   , type = "coxreg"
-  , plot_type = "s_val"
+  , plot_type = "p_val"
   , n_values = 1e4L
   , conf_level = c(0.95)
-  , null_values = c(0)
+  , null_values = log(c(1))
   , trans = "exp"
   , alternative = "two_sided"
-  , log_yaxis = TRUE
+  , log_yaxis = FALSE
   , cut_logyaxis = 0.05
   , xlab = "HR"
   , xlim = log(c(0.7, 1.9))
   , together = FALSE
-  , plot_p_limit = 1 - 0.999
+  , plot_p_limit = 1-0.999
+  , plot_counternull = TRUE
 )
 
 stama$plot <- stama$plot +
-  annotate(geom = "text", label = "A", x = 0.7, y = 0.99, size = 10, fontface = "bold") +
-  # geom_segment(aes(x = 1.413685, y = -0.001, xend = 1.413685, yend = 0.195), linetype = 3) +
-  geom_point(aes(x = 1.413685, y = 0.195), size = 4, pch = 21, colour = "black", fill = "white", stroke = 1.7)
+  annotate(geom = "text", label = "A", x = 0.7, y = 0.99, size = 10, fontface = "bold")
 
 stama$plot
 
@@ -66,50 +66,56 @@ stama$conf_frame
 stama$counternull_frame
 
 #-----------------------------------------------------------------------------------------
-# Stamatakis et al. (2017) + Petersen et al. (2016)
+# Stamatakis et al. (2017) + Petersen et al. (2016) + Meta-Analysis (Figure 1B)
 #-----------------------------------------------------------------------------------------
 
 stama_petersen <- conf_dist(
   estimate = c(
-    0.1730998   # Stamatakis total sitting time
+    0.1730998 # Stamatakis total sitting time
     , log(1.10) # Petersen total sitting time (both sexes)
+    , 0.1148205 # Meta-analytic estimate
   )
   , stderr = c(
-    0.1336387   # Stamatakis total sitting time
+    0.1336387 # Stamatakis total sitting time
     , 0.0773228 # Petersen total sitting time (both sexes)
+    , 0.06692738 # Meta-analytic standard error
   )
   , est_names = c(
     "Stamatakis et al. (2017)"
     , "Petersen et al. (2016)"
+    , "Meta-analysis"
   )
   , type = "coxreg"
   , plot_type = "p_val"
   , n_values = 1e4L
   , conf_level = c(0.95)
-  , null_values = c(0)
+  , null_values = log(c(1))
   , trans = "exp"
   , alternative = "two_sided"
-  , log_yaxis = TRUE
+  , log_yaxis = FALSE
   , cut_logyaxis = 0.05
   , xlab = "HR"
   , xlim = log(c(0.7, 1.9))
   , together = TRUE
-  , plot_p_limit = 1 - 0.999
+  , plot_p_limit = 0.001
+  , plot_counternull = FALSE
 )
 
 stama_petersen$plot$layers[[1]] <- NULL
 
 stama_petersen$plot <- stama_petersen$plot +
   geom_line(aes(x = values, y = p_two, linetype = variable), size = 1.25, inherit.aes = FALSE) +
-  scale_linetype_manual(values = c(1, 2), name = "") +
+  # scale_colour_manual(values = c("black", "black"), name = "") +
+  scale_linetype_manual(values = c(1, 2, 3), name = "") +
   theme(
     legend.title = element_blank()
     , legend.spacing.x = unit(0.5, "cm")
-    , legend.key.size = unit(2.1, "line")
-    , legend.position= c(0.815, 0.9)
+    , legend.key.size = unit(1.6, "line")
+    , legend.position= c(0.815, 0.87)
+    
   ) +
   guides(
-    linetype = guide_legend(nrow = 2, keywidth = 2.5)
+    linetype = guide_legend(nrow = 3, keywidth = 2.5)
   ) +
   annotate(geom = "text", label = "B", x = 0.7, y = 1, size = 10, fontface = "bold")
 
@@ -118,17 +124,63 @@ stama_petersen$plot
 stama_petersen$conf_frame
 stama_petersen$counternull_frame
 
-# Combine those
+#-----------------------------------------------------------------------------------------
+# Critical-value plot (Figure 1C)
+#-----------------------------------------------------------------------------------------
+
+stama_petersen$res_frame$quant_vals <- qnorm(stama_petersen$res_frame$p_one)
+
+theme_set(theme_bw())
+p <- ggplot(data = stama_petersen$res_frame, aes(x = values, y = quant_vals)) +
+  geom_line(aes(linetype = variable), size = 1.5) +
+  geom_hline(yintercept = qnorm(0.05/2), linetype = 2) +
+  xlab("HR") +
+  ylab("Critical value") +
+  scale_x_continuous(trans = "log", limits = c(0.7, 1.9), breaks = scales::pretty_breaks(n = 10)) +
+  scale_y_continuous(breaks = seq(-4, 0, 0.5)) +
+  scale_linetype_manual(name = "", values = c(1, 2, 3)) +
+  theme(
+    legend.title = element_blank()
+    , legend.spacing.x = unit(0.5, "cm")
+    , legend.key.size = unit(1.6, "line")
+    , legend.position= c(0.82, 0.87)
+    , axis.title.y.left=element_text(colour = "black", size = 17, hjust = 0.5, margin = margin(0, 10, 0, 0))
+    , axis.title.y.right=element_text(colour = "black", size = 17, hjust = 0.5, margin = margin(0, 0, 0, 10))
+    , axis.text.x=element_text(colour = "black", size=15)
+    , axis.text.y=element_text(colour = "black", size=15)
+    , axis.title.x=element_text(colour = "black", size = 17)
+    , panel.grid.minor.y = element_blank()
+    , plot.title = element_text(face = "bold")
+    , legend.text=element_text(size=15)
+  ) +
+  guides(
+    linetype = guide_legend(nrow = 3, keywidth = 2.5)
+  ) +
+  annotate(geom = "text", label = "C", x = 0.7, y = 0, size = 10, fontface = "bold") +
+  geom_label(
+    data = data.frame(theor_values = 0, p_value = qnorm(0.05/2), label = "0.05")
+    , mapping = aes(x = theor_values, y = p_value, label = label)
+    , inherit.aes = FALSE
+    , label.size = NA
+    , parse = TRUE
+    , size = 5.5
+    , hjust = "inward"
+  )
+
+
+# Combine the three plots into one
 
 stama_peter_comb <- ggarrange(
   stama$plot
   , stama_petersen$plot
+  , p
   , ncol = 1
-  , nrow = 2
-  , heights = c(1, 1.1)
+  , nrow = 3
+  # , heights = c(1, 1.1)
+  , align = c("hv")
 )
 
-stama_peter_comb
+# ggsave(paste(gpath, "Fig1.tiff", sep = "/"), stama_peter_comb, width = 17.5*0.6, height = 27*0.6, dpi = 400, compression = "lzw")
 
 #-----------------------------------------------------------------------------------------
 # Canning et al. (2014)
@@ -148,18 +200,18 @@ canning <- conf_dist(
   , null_values = c(0)
   , trans = "exp"
   , alternative = "two_sided"
-  , log_yaxis = TRUE
+  , log_yaxis = FALSE
   , cut_logyaxis = 0.05
   , xlab = "IRR"
-  , xlim = log(c(0.25, 1.61))
+  , xlim = log(c(0.35, 1.71))
   , together = FALSE
-  , plot_p_limit = 1 - 0.999
+  , plot_p_limit = 1-0.999
+  , plot_counternull = TRUE
 )
 
 canning$plot <- canning$plot +
   geom_vline(xintercept = 0.6, linetype = 2, size = 0.5) +
-  geom_point(aes(x = 0.5329, y = 0.1851), size = 4, pch = 21, colour = "black", fill = "white", stroke = 1.7) +
-  scale_x_continuous(breaks = seq(0.2, 1.6, 0.1), limits = c(0.25, 1.61))
+  scale_x_continuous(trans = "log", breaks = c(seq(0.3, 1, 0.1), seq(1, 1.8, 0.2)))
 
 canning$conf_frame
 canning$counternull_frame
@@ -191,7 +243,7 @@ hochsmann <- conf_dist(
   , est_names = c("VO2peak")
   , conf_level = c(0.95)
   , null_values = c(-3.5)
-  , log_yaxis = TRUE
+  , log_yaxis = FALSE
   , cut_logyaxis = 0.05
   , trans = "identity"
   , alternative = "one_sided"
@@ -205,15 +257,10 @@ hochsmann$plot$layers[[1]] <- NULL
 
 hochsmann$plot <- hochsmann$plot +
   geom_line(aes(x = values, y = p_two, linetype = hypothesis), size = 1.25, inherit.aes = FALSE) +
-  # scale_colour_manual(values = c("black", "black"), name = "") +
   scale_linetype_manual(values = c(1, 2), name = "", labels = c(
     expression("H"[1]*": "*beta*" < "*theta)
     , expression("H"[1]*": "*beta*" > "*theta))
   ) +
-  # scale_linetype_manual(values = c(1, 2), name = "", labels = c(
-  #   expression("H"[1]*": "*beta*" < "*delta)
-  #   , expression("H"[1]*": "*beta*" > -"*delta))
-  # ) +
   scale_x_continuous(limits = c(-4, 6.5), breaks = seq(-100, 100, 1)) +
   theme(
     legend.title = element_blank()
@@ -224,7 +271,6 @@ hochsmann$plot <- hochsmann$plot +
     , legend.position= c(0.9, 0.9)
     , axis.title.x=element_text(colour = "black", size = 17, margin=margin(11, 0, 0, 0))
   )
-
 
 hochsmann$conf_frame
 hochsmann$counternull_frame
