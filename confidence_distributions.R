@@ -510,13 +510,13 @@ conf_dist <- function(
       for (j in seq_along(null_values)) {
         
         counternull_tmp <- res$counternull_frame$counternull[res$counternull_frame$variable %in% est_names[i] & res$counternull_frame$null_value %in% null_values_trans[j]]
-
+        
         if ((counternull_tmp <= plot_range_tmp[2]) & (counternull_tmp >= plot_range_tmp[1])) {
           
           counternull_index_tmp <- which.min(abs(res$res_frame$values[res$res_frame$variable %in% est_names[i]] - counternull_tmp))
           
           res$res_frame$counternull[res$res_frame$variable %in% est_names[i]][counternull_index_tmp] <- res$res_frame$p_two[res$res_frame$variable %in% est_names[i]][which.min(abs(res$res_frame$values[res$res_frame$variable %in% est_names[i]] - null_values_trans[j]))]
-            
+          
         }
       }
     }
@@ -578,7 +578,7 @@ conf_dist <- function(
     , pdf = "Confidence density"
     , s_val = expression(paste("Surprisal in bits (two-sided ",~italic("P"), "-value)", sep = ""))
   )
-
+  
   p <- ggplot(res$res_frame, aes(x = values, y = eval(parse(text = y_var)), group = variable))
   
   if ((length(estimate) >= 2) & together == TRUE) {
@@ -621,9 +621,9 @@ conf_dist <- function(
   # )
   
   p <- p + xlab(xlab) +
-    ylab(y_lab) +
-    # coord_cartesian(ylim = limit) +
-    scale_x_continuous(breaks = scales::pretty_breaks(n = 15))
+    ylab(y_lab) 
+  # coord_cartesian(ylim = limit) +
+  # scale_x_continuous(breaks = scales::pretty_breaks(n = 15))
   
   if (plot_type %in% "p_val") {
     if (log_yaxis == TRUE & (p_cutoff < cut_logyaxis)) {
@@ -723,12 +723,47 @@ conf_dist <- function(
     p <- p + geom_vline(data = res$counternull_frame, aes(xintercept = null_value), linetype = 1, size = 0.5)
   }
   
-  if (plot_type %in% c("p_val", "s_val", "cdf", "pdf") && !is.null(xlim) & ((together == TRUE & (length(estimate) >= 2)) | (length(estimate) < 2))) {
-    # p <- p + scale_x_continuous(limits = do.call(trans, list(x = xlim)), breaks = scales::pretty_breaks(n = 15))
+  # if (plot_type %in% c("p_val", "s_val", "cdf", "pdf") && !is.null(xlim) & ((together == TRUE & (length(estimate) >= 2)) | (length(estimate) < 2))) {
+  #   # p <- p + scale_x_continuous(limits = do.call(trans, list(x = xlim)), breaks = scales::pretty_breaks(n = 15))
+  #   p <- p +
+  #     # coord_cartesian(xlim = do.call(trans, list(x = xlim)), ylim = limit) +
+  #     scale_x_continuous(breaks = scales::pretty_breaks(n = 10), limits = xlim)
+  # }
+  
+  # if (plot_type %in% c("p_val", "s_val", "cdf", "pdf") && !is.null(xlim) & ((together == TRUE & (length(estimate) >= 2)) | (length(estimate) < 2))) {
+  
+  # p <- p + scale_x_continuous(limits = do.call(trans, list(x = xlim)), breaks = scales::pretty_breaks(n = 15))
+  
+  if (trans %in% "exp" && plot_type %in% "p_val") {
+    
+    curr_x_limits <- ggplot_build(p)$layout$panel_params[[1]]$x.range
+    
+    p <- p + scale_x_continuous(trans = "log", breaks = scales::pretty_breaks(n = 10))
+    
+    if (log_yaxis == TRUE) {
+      p <- p + annotate("rect", xmin=0, xmax=100, ymin=ifelse(alternative %in% "two_sided", plot_p_limit, plot_p_limit*2), ymax=cut_logyaxis, alpha=0.1, colour = grey(0.9))
+    }
+
+    p <- p + coord_cartesian(xlim = c(min(curr_x_limits, xlim), max(curr_x_limits, xlim)), expand = TRUE)
+    
+    if (!is.null(hlines_tmp)) {
+      p <- p + geom_hline(yintercept = hlines_tmp, linetype = 2)
+    }
+    
+  } else if (trans %in% "exp" && plot_type %in% c("cdf", "pdf", "s_val")){
+    
+    p <- p +
+      # coord_cartesian(xlim = do.call(trans, list(x = xlim)), ylim = limit) +
+      scale_x_continuous(trans = "log", breaks = scales::pretty_breaks(n = 10), limits = xlim)
+    
+  } else {
+    
     p <- p +
       # coord_cartesian(xlim = do.call(trans, list(x = xlim)), ylim = limit) +
       scale_x_continuous(breaks = scales::pretty_breaks(n = 10), limits = xlim)
+    
   }
+  # }
   
   if (length(estimate) >= 2 & together == FALSE) {
     if (plot_type %in% "pdf"){
@@ -758,6 +793,10 @@ conf_dist <- function(
       text_frame$p_value <- -log2(text_frame$p_value)
     }
     
+    if (trans %in% "exp" && alternative %in% "two_sided") {
+      text_frame$theor_values <- 0
+    }
+
     # if (!is.null(conf_level) & (together == FALSE | (together == TRUE & (length(estimate) < 2)))) {
     p <- p + geom_label(
       data = text_frame
@@ -787,14 +826,15 @@ conf_dist <- function(
       
       p <- p + geom_point(aes(x = values, y = counternull, colour = variable), size = 4, pch = 21, fill = "white", stroke = 1.7) +
         guides(colour = guide_legend(override.aes = list(pch = NA)))
-
+      
     } else if (together == FALSE) {
       
       p <- p + geom_point(aes(x = values, y = counternull), colour = "black", size = 4, pch = 21, fill = "white", stroke = 1.7)
       
     }
-
+    
   }
+  
   
   res$plot <- p
   
@@ -1608,7 +1648,7 @@ cdist_propdiff <- function(
     conf_mat_tmp <- matrix(NA, ncol = 4, nrow = length(conf_level))
     
     limits_tmp <- matrix(NA, ncol = 2, nrow = length(conf_tmp))
-
+    
     for (j in seq_along(conf_tmp)) {
       limits_tmp[j, ] <- wilson_cicc_diff(estimate = estimate, n = n, conf_level = conf_tmp[j], alternative = alternative)
     }
