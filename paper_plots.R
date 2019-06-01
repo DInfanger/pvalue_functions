@@ -30,7 +30,55 @@ source(paste(scripts_path, "confidence_distributions.R", sep = "/"))
 # Graphics
 #=========================================================================================
 #-----------------------------------------------------------------------------------------
-# Stamatakis et al. (2017): Br J Sports Med (Figure 1A)
+# Stamatakis et al. (2017): br J Sports Med. Dichotomous illustration (Poole 1987) (Figure 1)
+#-----------------------------------------------------------------------------------------
+
+plot_dat <- data.frame(
+  HR = seq(0.7, 1.9, length.out = 100)
+)
+
+plot_dat$pvalue <- NA
+plot_dat$pvalue[plot_dat$HR < 0.92 | plot_dat$HR > 1.55] <- 0
+plot_dat$pvalue[plot_dat$HR >= 0.92 & plot_dat$HR <= 1.55] <- 1
+
+
+theme_set(theme_bw())
+p_stama_dichotom <- ggplot(data = plot_dat, aes(x = HR, y = pvalue)) +
+  # geom_line(size = 1.5) +
+  geom_segment(aes(x = 0.7, xend = 0.92, y = 0, yend = 0), size = 1.5) +
+  geom_segment(aes(x = 1.55, xend = 1.9, y = 0, yend = 0), size = 1.5) +
+  geom_segment(aes(x = 0.92, xend = 1.55, y = 1, yend = 1), size = 1.5) +
+  geom_segment(aes(x = 0.92, xend = 0.92, y = 0, yend = 1), size = 1.5) +
+  geom_segment(aes(x = 1.55, xend = 1.55, y = 0, yend = 1), size = 1.5) +
+  # geom_segment(aes(x = 1.19, xend = 1.19, y = 0, yend = 1), size = 1.1, linetype = 2) +
+  geom_point(aes(x = 1.19, y = 1), size = 4.2, pch = 21, colour = "black", fill = "black", stroke = 1.7) +
+  geom_segment(aes(x = 1, xend = 1, y = 0, yend = 1), size = 1, linetype = 2) +
+  xlab("HR") +
+  ylab("Relation\nto\n95% confidence\ninterval") +
+  scale_y_continuous(breaks = c(0, 1), labels = c("Incompatible/\nsignificant", "Compatible/\nnot significant")) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 10), trans = "log") +
+  theme(
+    axis.title.y=element_text(colour = "black", size = 17, hjust = 0.5, vjust = 0.5, margin=margin(t = 0, r = -60, b = 0, l = 0), angle = 0),
+    axis.title.x=element_text(colour = "black", size = 17),
+    # axis.title.y=element_text(size=15,hjust=0.5, vjust=1),
+    axis.text.x=element_text(colour = "black", size=15),
+    axis.text.y=element_text(colour = "black", size=15),
+    # plot.margin=unit(c(2,2,2,2,2),"line"),
+    legend.position=c(0.9, 0.9),
+    legend.title = element_blank(),
+    legend.text=element_text(size=14),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    # panel.grid.major = element_line(colour=grey(0.8), size=0.5),
+    legend.key=element_blank(),
+    plot.title = element_text(size = 15, face = "bold"),
+    strip.text.x=element_text(size=15)
+  )
+
+p_stama_dichotom
+
+#-----------------------------------------------------------------------------------------
+# Stamatakis et al. (2017): Br J Sports Med (Figure 2A)
 #-----------------------------------------------------------------------------------------
 
 stama <- conf_dist(
@@ -66,7 +114,7 @@ stama$conf_frame
 stama$counternull_frame
 
 #-----------------------------------------------------------------------------------------
-# Stamatakis et al. (2017) + Petersen et al. (2016) + Meta-Analysis (Figure 1B)
+# Stamatakis et al. (2017) + Petersen et al. (2016) + Meta-Analysis (Figure 2B)
 #-----------------------------------------------------------------------------------------
 
 stama_petersen <- conf_dist(
@@ -125,7 +173,7 @@ stama_petersen$conf_frame
 stama_petersen$counternull_frame
 
 #-----------------------------------------------------------------------------------------
-# Critical-value plot (Figure 1C)
+# Critical-value plot (Figure 2C)
 #-----------------------------------------------------------------------------------------
 
 stama_petersen$res_frame$quant_vals <- qnorm(stama_petersen$res_frame$p_one)
@@ -183,7 +231,7 @@ stama_peter_comb <- ggarrange(
 # ggsave(paste(gpath, "Fig1.tiff", sep = "/"), stama_peter_comb, width = 17.5*0.6, height = 27*0.6, dpi = 400, compression = "lzw")
 
 #-----------------------------------------------------------------------------------------
-# Canning et al. (2014)
+# Canning et al. (2014) (Figure 3)
 #-----------------------------------------------------------------------------------------
 
 canning <- conf_dist(
@@ -228,7 +276,7 @@ log(1.17) - log(1) # Distance upper limits to 1
 log(0.60) - log(0.45) # Distance lower limit to 0.6
 
 #-----------------------------------------------------------------------------
-# Höchsmann et al. (2017)
+# Höchsmann et al. (2017) (Figure 4)
 #-----------------------------------------------------------------------------
 
 hochsmann <- conf_dist(
