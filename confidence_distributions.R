@@ -715,9 +715,10 @@ conf_dist <- function(
     
     p <- p + geom_hline(yintercept = hlines_tmp, linetype = 2)
     
-  } else if (plot_type %in% c("pdf", "cdf")) {
-    p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
-  }
+  } 
+  # else if (plot_type %in% c("pdf", "cdf")) {
+  #   p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
+  # }
   
   if (!is.null(null_values)) {
     p <- p + geom_vline(data = res$counternull_frame, aes(xintercept = null_value), linetype = 1, size = 0.5)
@@ -736,31 +737,57 @@ conf_dist <- function(
   
   if (trans %in% "exp" && plot_type %in% "p_val") {
     
-    curr_x_limits <- ggplot_build(p)$layout$panel_params[[1]]$x.range
+    xlim_new <- xlim
+    
+    # curr_x_limits <- ggplot_build(p)$layout$panel_params[[1]]$x.range
     
     p <- p + scale_x_continuous(trans = "log", breaks = scales::pretty_breaks(n = 10))
     
     if (log_yaxis == TRUE) {
       p <- p + annotate("rect", xmin=0, xmax=100, ymin=ifelse(alternative %in% "two_sided", plot_p_limit, plot_p_limit*2), ymax=cut_logyaxis, alpha=0.1, colour = grey(0.9))
     }
-
-    p <- p + coord_cartesian(xlim = c(min(curr_x_limits, xlim), max(curr_x_limits, xlim)), expand = TRUE)
     
-    if (!is.null(hlines_tmp)) {
+    if (exists("null_values_trans") && xlim[1] <= min(null_values_trans)) {
+      xlim_new[1] <- xlim[1]
+    } else if (exists("null_values_trans") && xlim[1] > min(null_values_trans)) {
+      xlim_new[1] <- min(res$res_frame$values, na.rm = TRUE)
+    }
+    
+    if (exists("null_values_trans") && xlim[2] >= max(null_values_trans)) {
+      xlim_new[2] <- xlim[2]
+    } else if (exists("null_values_trans") && xlim[2] < max(null_values_trans)) {
+      xlim_new[2] <- max(res$res_frame$values, na.rm = TRUE)
+    }
+    
+    p <- p + coord_cartesian(xlim = xlim_new, expand = TRUE)
+    
+    if (exists("hlines_tmp")) {
       p <- p + geom_hline(yintercept = hlines_tmp, linetype = 2)
     }
     
   } else if (trans %in% "exp" && plot_type %in% c("cdf", "pdf", "s_val")){
     
     p <- p +
-      # coord_cartesian(xlim = do.call(trans, list(x = xlim)), ylim = limit) +
       scale_x_continuous(trans = "log", breaks = scales::pretty_breaks(n = 10), limits = xlim)
     
   } else {
     
+    xlim_new <- xlim
+    
+    if (!is.null(null_values) && xlim[1] <= min(null_values)) {
+      xlim_new[1] <- xlim[1]
+    } else if (!is.null(null_values) && xlim[1] > min(null_values)) {
+      xlim_new[1] <- min(res$res_frame$values, na.rm = TRUE)
+    }
+    
+    if (!is.null(null_values) && xlim[2] >= max(null_values)) {
+      xlim_new[2] <- xlim[2]
+    } else if (!is.null(null_values) && xlim[2] < max(null_values)) {
+      xlim_new[2] <- max(res$res_frame$values, na.rm = TRUE)
+    }
+
     p <- p +
-      # coord_cartesian(xlim = do.call(trans, list(x = xlim)), ylim = limit) +
-      scale_x_continuous(breaks = scales::pretty_breaks(n = 10), limits = xlim)
+      scale_x_continuous(breaks = scales::pretty_breaks(n = 10), limits = xlim_new)
     
   }
   # }
@@ -796,7 +823,7 @@ conf_dist <- function(
     if (trans %in% "exp" && alternative %in% "two_sided") {
       text_frame$theor_values <- 0
     }
-
+    
     # if (!is.null(conf_level) & (together == FALSE | (together == TRUE & (length(estimate) < 2)))) {
     p <- p + geom_label(
       data = text_frame
@@ -838,7 +865,7 @@ conf_dist <- function(
   
   res$plot <- p
   
-  print(p)
+  suppressWarnings(print(p))
   
   return(res)
   
