@@ -1,5 +1,5 @@
 #=========================================================================================
-# P-value curves to reproduce plots in the paper
+# P-value functions to reproduce the plots in the paper
 # Author: Denis Infanger
 # Date (dd.mm.yyyy): 21.11.2018
 #=========================================================================================
@@ -9,6 +9,7 @@
 
 library(ggpubr)
 library(metafor)
+library(pvaluefunctions)
 
 #-----------------------------------------------------------------------------------------
 # Set paths
@@ -20,17 +21,12 @@ gpath <- "./output/graphics"
 tpath <- "./output/text"
 # scripts_path <- ""
 
-#-----------------------------------------------------------------------------------------
-# Load function
-#-----------------------------------------------------------------------------------------
-
-source(paste(scripts_path, "confidence_distributions.R", sep = "/"))
-
 #=========================================================================================
-# Graphics
+# Graphics in the paper
 #=========================================================================================
+
 #-----------------------------------------------------------------------------------------
-# Stamatakis et al. (2017): br J Sports Med. Dichotomous illustration (Poole 1987) (Figure 1)
+# Figure 1: Stamatakis et al. (2017): br J Sports Med. Dichotomous illustration (cf. Poole 1987)
 #-----------------------------------------------------------------------------------------
 
 plot_dat <- data.frame(
@@ -78,7 +74,7 @@ p_stama_dichotom <- ggplot(data = plot_dat, aes(x = HR, y = pvalue)) +
 p_stama_dichotom
 
 #-----------------------------------------------------------------------------------------
-# Stamatakis et al. (2017): Br J Sports Med (Figure 2A)
+# Figure 2A: Stamatakis et al. (2017): Br J Sports Med
 #-----------------------------------------------------------------------------------------
 
 stama <- conf_dist(
@@ -114,7 +110,7 @@ stama$conf_frame
 stama$counternull_frame
 
 #-----------------------------------------------------------------------------------------
-# Stamatakis et al. (2017) + Petersen et al. (2016) + Meta-Analysis (Figure 2B)
+# Figure 2B: Stamatakis et al. (2017) + Petersen et al. (2016) + Meta-Analysis
 #-----------------------------------------------------------------------------------------
 
 stama_petersen <- conf_dist(
@@ -173,7 +169,7 @@ stama_petersen$conf_frame
 stama_petersen$counternull_frame
 
 #-----------------------------------------------------------------------------------------
-# Critical-value plot (Figure 2C)
+# Figure 2C: Critical-value plot
 #-----------------------------------------------------------------------------------------
 
 stama_petersen$res_frame$quant_vals <- qnorm(stama_petersen$res_frame$p_one)
@@ -231,7 +227,7 @@ stama_peter_comb <- ggarrange(
 # ggsave(paste(gpath, "Fig1.tiff", sep = "/"), stama_peter_comb, width = 17.5*0.6, height = 27*0.6, dpi = 400, compression = "lzw")
 
 #-----------------------------------------------------------------------------------------
-# Canning et al. (2014) (Figure 3)
+# Figure 3: Canning et al. (2014)
 #-----------------------------------------------------------------------------------------
 
 canning <- conf_dist(
@@ -261,6 +257,8 @@ canning$plot <- canning$plot +
   geom_vline(xintercept = 0.6, linetype = 2, size = 0.5) +
   scale_x_continuous(trans = "log", breaks = c(seq(0.3, 1, 0.1), seq(1, 1.8, 0.2)))
 
+canning$plot
+
 canning$conf_frame
 canning$counternull_frame
 
@@ -276,7 +274,7 @@ log(1.17) - log(1) # Distance upper limits to 1
 log(0.60) - log(0.45) # Distance lower limit to 0.6
 
 #-----------------------------------------------------------------------------
-# Höchsmann et al. (2017) (Figure 4)
+# Figure 4: Höchsmann et al. (2017)
 #-----------------------------------------------------------------------------
 
 hochsmann <- conf_dist(
@@ -319,6 +317,8 @@ hochsmann$plot <- hochsmann$plot +
     , legend.position= c(0.9, 0.9)
     , axis.title.x=element_text(colour = "black", size = 17, margin=margin(11, 0, 0, 0))
   )
+
+hochsmann$plot
 
 hochsmann$conf_frame
 hochsmann$counternull_frame
