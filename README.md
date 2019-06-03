@@ -4,8 +4,8 @@
   - [R-package `pvaluefunctions` has been released on
     CRAN\!](#r-package-pvaluefunctions-has-been-released-on-cran)
   - [Overview](#overview)
-  - [Installation and recreating of the graphics in the
-    paper](#installation-and-recreating-of-the-graphics-in-the-paper)
+  - [Installation and recreation of the graphics in the
+    paper](#installation-and-recreation-of-the-graphics-in-the-paper)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -13,8 +13,8 @@
 
 As the R package
 [`pvaluefunctions`](https://cran.r-project.org/package=pvaluefunctions)
-has now been released on CRAN, all new information can be found on my
-[GitHub page for the
+has now been released on CRAN, all new information concerning the
+package and updates can be found on my [GitHub page for the
 package](https://github.com/DInfanger/pvaluefunctions).
 
 This repository is no longer being supported with updates\! To reproduce
@@ -22,16 +22,16 @@ the graphics in the paper, see below.
 
 ## Overview
 
-A description of the package and some example can be found on the
-official [GitHub page for the
+A description of the package and some examples of how to use the package
+can be found on the official [GitHub page for the
 package](https://github.com/DInfanger/pvaluefunctions).
 
 <!-- This repository contains R functions to create graphics of *p*-value functions, confidence distributions, confidence densities, or the [Surprisal value (S-value)](http://www.umsl.edu/~fraundorfp/egsurpri.html) (Greenland 2019). An R-script to reproduce the plots in the publication is also available. -->
 
-## Installation and recreating of the graphics in the paper
+## Installation and recreation of the graphics in the paper
 
 Install the package from CRAN using
-`install.packages(c("pvaluefunctions"))` and then load it using
+`install.packages("pvaluefunctions")` and then load it using
 `library(pvaluefunctions)`.
 
 <!-- Download the file `confidence_distributions.R` to your computer. You can either `source()` the function in R or open it, select and run everything. After loading the function, it's ready for use. -->
