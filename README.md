@@ -1,13 +1,23 @@
 *P*-value functions
 ================
 
-  - [R-package `pvaluefunctions` has been released on
-    CRAN\!](#r-package-pvaluefunctions-has-been-released-on-cran)
-  - [Overview](#overview)
-  - [Installation and recreation of the graphics in the
-    paper](#installation-and-recreation-of-the-graphics-in-the-paper)
+  - [Information](#information)
+      - [R-package `pvaluefunctions` has been released on
+        CRAN\!](#r-package-pvaluefunctions-has-been-released-on-cran)
+      - [Overview](#overview)
+      - [Installation and recreation of the graphics in the
+        paper](#installation-and-recreation-of-the-graphics-in-the-paper)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# Information
+
+This repository contains R scripts to reproduce the graphics from [our
+paper](https://doi.org/10.1002/sim.8293):
+
+Infanger D, Schmidt-Trucksäss A. (2019): *P* value functions: An
+underused method to present research results and to promote quantitative
+reasoning. *Statistics in Medicine,* 1-9. doi: 10.1002/sim.8293.
 
 ## R-package `pvaluefunctions` has been released on CRAN\!
 

@@ -16,6 +16,12 @@ knitr::opts_chunk$set(
 )
 ```
 
+# Information
+
+This repository contains R scripts to reproduce the graphics from [our paper](https://doi.org/10.1002/sim.8293):
+
+Infanger D, Schmidt-Trucksäss A. (2019): *P* value functions: An underused method to present research results and to promote quantitative reasoning. *Statistics in Medicine,* 1-9. doi: 10.1002/sim.8293.
+
 ## R-package `pvaluefunctions` has been released on CRAN!
 
 As the R package [`pvaluefunctions`](https://cran.r-project.org/package=pvaluefunctions) has now been released on CRAN, all new information concerning the package and updates can be found on my [GitHub page for the package](https://github.com/DInfanger/pvaluefunctions).
