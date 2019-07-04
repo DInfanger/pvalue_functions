@@ -1,7 +1,8 @@
 #=========================================================================================
 # P-value functions to reproduce the plots in the paper
+# DOI: https://doi.org/10.1002/sim.8293
 # Author: Denis Infanger
-# Date (dd.mm.yyyy): 21.11.2018
+# Creation date (dd.mm.yyyy): 21.11.2018
 #=========================================================================================
 #-----------------------------------------------------------------------------------------
 # Load packages
@@ -177,7 +178,7 @@ stama_petersen$res_frame$quant_vals <- qnorm(stama_petersen$res_frame$p_one)
 theme_set(theme_bw())
 p <- ggplot(data = stama_petersen$res_frame, aes(x = values, y = quant_vals)) +
   geom_line(aes(linetype = variable), size = 1.5) +
-  geom_hline(yintercept = qnorm(0.05/2), linetype = 2) +
+  geom_hline(yintercept = qnorm(c(0.01, 0.05, 0.1)/2), linetype = 2) +
   xlab("HR") +
   ylab("Critical value") +
   scale_x_continuous(trans = "log", limits = c(0.7, 1.9), breaks = scales::pretty_breaks(n = 10)) +
@@ -202,11 +203,11 @@ p <- ggplot(data = stama_petersen$res_frame, aes(x = values, y = quant_vals)) +
   ) +
   annotate(geom = "text", label = "C", x = 0.7, y = 0, size = 10, fontface = "bold") +
   geom_label(
-    data = data.frame(theor_values = 0, p_value = qnorm(0.05/2), label = "0.05")
+    data = data.frame(theor_values = c(0, 0, 0), p_value = qnorm(c(0.01, 0.05, 0.1)/2), label = c("0.01", "0.05", "0.10"))
     , mapping = aes(x = theor_values, y = p_value, label = label)
     , inherit.aes = FALSE
     , label.size = NA
-    , parse = TRUE
+    , parse = FALSE
     , size = 5.5
     , hjust = "inward"
   )
@@ -223,8 +224,6 @@ stama_peter_comb <- ggarrange(
   # , heights = c(1, 1.1)
   , align = c("hv")
 )
-
-# ggsave(paste(gpath, "Fig1.tiff", sep = "/"), stama_peter_comb, width = 17.5*0.6, height = 27*0.6, dpi = 400, compression = "lzw")
 
 #-----------------------------------------------------------------------------------------
 # Figure 3: Canning et al. (2014)
