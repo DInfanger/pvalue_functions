@@ -1,8 +1,7 @@
 ---
-title: "*P*-value functions"
 output:
   github_document:
-    toc: true
+    toc: false
     toc_depth: 3
 ---
 
@@ -16,7 +15,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Information
+# *P*-value functions <img src="man/figures/logo2.svg" align="right" width="120" />
+
+## Information
 
 This repository contains R scripts to reproduce the graphics from [our paper](https://doi.org/10.1002/sim.8293):
 

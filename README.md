@@ -1,16 +1,9 @@
-*P*-value functions
-================
-
-  - [Information](#information)
-      - [R-package `pvaluefunctions` has been released on
-        CRAN\!](#r-package-pvaluefunctions-has-been-released-on-cran)
-      - [Overview](#overview)
-      - [Installation and recreation of the graphics in the
-        paper](#installation-and-recreation-of-the-graphics-in-the-paper)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Information
+# *P*-value functions <img src="man/figures/logo2.svg" align="right" width="120" />
+
+## Information
 
 This repository contains R scripts to reproduce the graphics from [our
 paper](https://doi.org/10.1002/sim.8293):
